@@ -21,6 +21,8 @@
 - Block 또는 Element의 속성을 나타낸다.
 - `disabled`, `checked`, `big`, `red` 등이 있다.
 
+---
+
 ![bem](images/bem.jpg)
 
 ## 예제
