@@ -2,4 +2,4 @@
 
 HTML
 
-- [`<script>` async, defer](html/script_async_defer.md)
+- [&lt;script&gt; async, defer](html/script_async_defer.md)
