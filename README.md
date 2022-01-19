@@ -8,4 +8,8 @@
 ## HTML
 
 - [&lt;script&gt; async, defer](html/script_async_defer.md)
-- [bem](html/bem.md)
+- [BEM](html/bem.md)
+
+## CSS
+
+- [CSS Variables](css/css_variables.md)
