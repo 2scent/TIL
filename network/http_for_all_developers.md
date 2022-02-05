@@ -175,7 +175,7 @@ https://www.google.com/search?q=hello&hl=ko`
 - 포트 번호는 생략됐지만 https이기 때문에 기본적으로 443을 가진다.
 - 다음과 같은 HTTP 요청 메세지를 만든다.
 
-```
+```http
 GET /search?q=hello&hl=ko HTTP/1.1
 Host: www.google.com
 ```
@@ -183,7 +183,7 @@ Host: www.google.com
 - 웹 브라우저가 생성한 HTTP 메시지를 여러 계층을 통해 TCP/IP 패킷으로 감싼 후, 인터넷을 통해 서버로 보낸다.
 - 요청을 받은 서버는 다음과 같이 그에 맞는 응답 메시지를 만들어 다시 클라이언트(웹 브라우저)로 보낸다.
 
-```
+```http
 HTTP/1.1 200 OK
 Content-Type: text/html;charset=UTF-8
 Content-Length: 3423
@@ -300,7 +300,7 @@ HTTP-message  = start-line
 
 #### 요청 메시지
 
-```
+```http
 GET /search?q=hello&hl=ko HTTP/1.1
 ```
 
@@ -311,7 +311,7 @@ GET /search?q=hello&hl=ko HTTP/1.1
 
 #### 응답 메시지
 
-```
+```http
 HTTP/1.1 200 OK
 ```
 
@@ -324,13 +324,13 @@ HTTP/1.1 200 OK
 
 #### 요청 메시지
 
-```
+```http
 Host: www.google.com
 ```
 
 #### 응답 메시지
 
-```
+```http
 Content-Type: text/html;charset=UTF-8
 Content-Length: 3423
 ```
@@ -341,11 +341,216 @@ Content-Length: 3423
 
 ### HTTP 메시지 바디
 
-```
+```html
 <html>
-  <body>...</body>
+  <body>
+    ...
+  </body>
 </html>
 ```
 
 - 실제 전송할 데이터
 - HTML, 텍스트, 이미지, 영상, JSON 등 바이트로 표현할 수 있는 모든 데이터 전송 가능
+
+# HTTP 메서드(Method)
+
+## API URI 설계
+
+- 가장 중요한 것은 **리소스 식별**
+- 회원 관련 API를 설계한다고 했을 때, 등록, 수정, 조회는 리소스가 아니다.
+- **회원이라는 개념 자체가 리소스 -> 회원 리소스를 URI에 매핑**
+- 등록, 수정, 조회 같은 기능들은 메서드를 이용
+
+### 회원 기능 API URL 설계
+
+- 회원 목록 조회 GET /members
+- 회원 조회 GET /members/{id}
+- 회원 등록 POST /members/{id}
+- 회원 수정 PATCH /members/{id}
+- 회원 삭제 DELETE /members/{id}
+- 계층 구조상 상위를 컬렉션으로 보고 복수단어 사용 권장(member -> members)
+
+## HTTP 메서드 종류
+
+### 주요 메서드
+
+- GET: 리소스 조회
+- POST: 요청 데이터 처리, 주로 등록에 사용
+- PUT: 리소스를 대체, 해당 리소스가 없으면 생성
+- PATCH: 리소스 부분 변경
+- DELETE: 리소스 삭제
+
+### 기타 메서드
+
+- HEAD: GET과 동일하지만 메시지 부분을 제외하고, 상태 줄과 헤더만 반환
+- OPTIONS: 대상 리소스에 대한 통신 가능 옵션(메서드)을 설명(주로 CORS에서 사용)
+- CONNECT: 대상 자원으로 식별되는 서버에 대한 터널을 설정
+- TRACE: 대상 리소스에 대한 경로를 따라 메시지 루프백 테스트를 수행
+- CONNECT와 TRACE는 거의 사용되지 않음
+
+## GET
+
+### 요청
+
+```http
+GET /members/100 HTTP/1.1
+Host: localhost:8080
+```
+
+### 응답
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 34
+
+{
+ "username": "young",
+ "age": 20
+}
+```
+
+- 리소스 조회
+- 데이터는 query를 통해서 전달
+- 메시지 바디를 사용할 수는 있지만 지원하지 않는 경우가 많음
+
+## POST
+
+### 요청
+
+```http
+POST /members HTTP/1.1
+Content-Type: application/json
+
+{
+ "username": "young",
+ "age": 20
+}
+```
+
+### 응답
+
+```http
+HTTP/1.1 201 Created
+Content-Type: application/json
+Content-Length: 34
+Location: /members/100
+
+{
+ "username": "young",
+ "age": 20
+}
+```
+
+- 요청 데이터 처리
+- 메시지 바디를 통해 서버로 요청 데이터 전달
+
+## POST의 역할
+
+- 새 리소스 생성
+  - 서버가 아직 식별하지 않은 새 리소스 생성
+- 요청 데이터 처리
+  - 단순히 데이터를 생성하거나, 변경하는 것 이상의 프로세스를 처리하는 경우
+  - POST의 결과로 새 리소스가 생성되지 않을 수 있음
+  - E.g., POST /orders/{orderId}/start-delivery **(컨트롤 URI)**
+- 다른 메서드로 처리하기 애매한 경우
+  - E.g., JSON으로 조회 데이터를 넘겨야 하는데, GET 메서드는 사용하기 어려운 경우
+  - 애매하면 POST로!
+
+## PUT
+
+- 리소스가 없으면 생성, 있으면 대체. 즉, **덮어쓰기**
+- POST와 다르게 클라이언트가 리소스를 식별
+
+### 주의할 점
+
+```json
+{
+  "username": "young",
+  "age": 20
+}
+```
+
+서버에 위와 같은 리소스가 있을 때
+
+```http
+PUT /members/100 HTTP/1.1
+Content-Type: application/json
+
+{
+ "age": 50
+}
+```
+
+위와 같은 요청을 보내면 리소스를 완전히 대체하기 때문에
+
+```json
+{
+  "age": 50
+}
+```
+
+username 필드는 삭제되고, age 필드만 남게 된다.
+
+## PATCH
+
+- 리소스 부분 변경
+
+```http
+PATCH /members/100 HTTP/1.1
+Content-Type: application/json
+
+{
+ "age": 50
+}
+```
+
+PUT과 같은 리소스에 위와 같은 요청을 보내면
+
+```json
+{
+  "username": "young",
+  "age": 50
+}
+```
+
+해당하는 필드만 부분적으로 변경된다.
+
+## DELETE
+
+- 리소스 제거
+
+```http
+DELETE /members/100 HTTP/1.1
+Host: localhost:8080
+```
+
+## HTTP 메서드의 속성
+
+- 안전(Safe Methods)
+- 멱등(Idempotent Methods)
+- 캐시 가능(Cacheable Methods)
+
+![HTTP Methods](images/http_methods.jpg)
+출처: [https://ko.wikipedia.org/wiki/HTTP](https://ko.wikipedia.org/wiki/HTTP)
+
+### 안전(Safe)
+
+- 호출해도 리소스를 변경하지 않는다.
+- 해당 리소스만 고려, 외부 요인까지 고려하지 않음
+
+### 멱등(Idempotent)
+
+- f(f(x)) = f(x)
+- 한 번을 호출하든 두 번을 호출하든 몇 번을 호출하든 결과가 동일
+- GET, PUT, DELETE는 멱등하지만 POST는 아님
+- PATCH는 설계에 따라 달라질 수 있음
+- 자동 복구 메커니즘에 활용할 수 있음
+  - E.g., 서버가 타임아웃 등으로 정상 응답을 못했을 때, 클라이언트가 같은 요청을 다시 해도 되는지의 판단 근거가 될 수 있음
+- 재요청 중간에 다른 곳에서 리소스를 변경한다면? 안전과 똑같이 외부 요인까지는 고려하지 않음
+
+### 캐시 가능(Cacheable)
+
+- 응답 결과 리소스를 캐시해도 되는가?
+- GET, HEAD, POST, PATCH 캐시 가능하지만 실제로는 **GET**, **HEAD** 정도만 캐시로 사용
+- POST, PATCH는 본문 내용까지 캐시 키로 고려해야 해서 구현이 어려움
