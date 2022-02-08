@@ -804,3 +804,367 @@ Content-Type: image/png
 - 일시적인 과부하 또는 예정된 작업으로 서비스 이용 불가
 - Retry-After 헤더 필드로 얼마 뒤에 복구되는지 응답 메시지에 보낼 수 있음
   - 현실적으로 서버 에러는 예상치 못하게 발생하기 때문에 적용하기 어려움
+
+# HTTP 헤더1 - 일반 헤더
+
+## HTTP 헤더 개요
+
+- header-field = field-name ":" OWS(띄어쓰기 허용) field-value OWS
+- field-name은 대소문자 구분 없음
+- HTTP 전송에 필요한 모든 메타 데이터
+
+### HTTP 헤더 분류 - RFC2616 (과거)
+
+![HTTP Request Headers](images/http_request_headers.png)
+
+출처: [https://developer.mozilla.org/ko/docs/Web/HTTP/Messages](https://developer.mozilla.org/ko/docs/Web/HTTP/Messages)
+
+- 헤더 분류
+  - General 헤더: 메시지 전체에 적용되는 정보
+  - Request 헤더: 요청 정보
+  - Response 헤더: 응답 정보
+  - Entity 헤더: 엔티티 바디 정보
+
+### HTTP 바디 - RFC2616 (과거)
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html;charset=UTF-8
+Content-Length: 3423
+
+<html>
+ <body>...</body>
+</html>
+```
+
+- `<html>...</html>` 부분이 메시지 본문(Message Body)으로 엔티티 본문(Entity Body) 전달
+- 엔티티 본문이 전달할 실제 데이터
+- `Content-Type`, `Content-Lenth` 같은 엔티티 헤더는 엔티티 본문의 데이터를 해석할 수 있는 정보 제공
+
+### HTTP 바디 - RFC7230 (최신)
+
+- 1999년에 작성된 RFC2616은 폐기되고, 2014년에 작성된 RFC723에서는 엔티티(Entity) 대신 **표현**(Representation)을 사용함
+  - 표현(Representation) = 표현 메타데이터(Representation Metadata) + 표현 데이터(Representation Data)
+- 메시지 본문(Message Body)를 통해 표현 데이터 전달
+- 메시지 본문 = 페이로드(Payload)
+- 표현은 전달할 실제 데이터
+- 표현 헤더는 표현 데이터를 해석할 수 있는 정보 제공
+- 참고: 표현 헤더는 표현 메타데이터와 페이로드 메시지를 구분해야 하지만 여기선 생략
+
+## 표현
+
+- 표현 헤더는 요청, 응답 둘다 사용
+
+### Content-Type
+
+> 표현 데이터 형식 설명
+
+- 미디어 타입, 문자 인코딩
+- E.g., `text/html; charset=utf-8`, `application/json`, `image/png`
+
+### Content-Encoding
+
+> 표현 데이터 인코딩
+
+- 표현 데이터를 압축하기 위해 사용
+- 전달하는 쪽에서 압축 후 인코딩 헤더를 추가하면, 받는 쪽에서 헤더 정보로 압축을 해제
+- E.g., `gzip`, `deflate`, `identity`
+
+### Content-Language
+
+> 표현 데이터의 자연 언어
+
+- E.g., `ko`, `en`, `en-US`
+
+### Content-Length
+
+> 표현 데이터의 길이
+
+- 바이트 단위
+- `Transfer-Encoding`을 사용하면 `Content-Length`를 사용하면 안 됨
+
+## 협상(Content Negotiation)
+
+> 클라이언트가 선호하는 표현 요청
+
+- Accept: 클라이언트가 선호하는 미디어 타입 전달
+- Accept-Charset: 클라이언트가 선호하는 문자 인코딩
+- Accept-Encoding: 클라이언트가 선호하는 압축 인코딩
+- Accept-Language: 클라이언트가 선호하는 자연 언어
+- 협상 헤더는 요청시에만 사용
+
+### Accept-Language 예시
+
+- 기본적으로 영어(en)를 지원하고, 추가적으로 한국어(ko)를 지원하는 서버가 있을 때, `Accept-Language` 없이 요청하면 영어(en)로 된 데이터를 응답
+- `Accept-Language: ko`와 같이 선호하는 언어를 헤더에 담아서 요청하면, 한국어(ko) 데이터를 응답받을 수 있음
+- 어디까지나 선호하는 표현을 요청하는 것이기 때문에 서버에서 한국어(ko)를 지원하지 않는다면 어쩔 수 없음
+
+### 협상과 우선순위 1 - Quality Values(q)
+
+```http
+GET /event
+Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+```
+
+- 0 ~ 1, 클수록 높은 우선순위
+- 생략하면 1
+
+### 협상과 우선순위 2 - Quality Values(q)
+
+```http
+GET /event
+Accept: text/*, text/plain, text/plain;format=flowed, */*
+```
+
+- 구체적인 것이 우선한다.
+  1. text/plain;format=flowed
+  2. text/plain
+  3. text/\*
+  4. _/_
+
+### 협상과 우선순위 3 - Quality Values(q)
+
+- 구체적인 것을 기준으로 미디어 타입을 맞춘다.
+
+- Accept: **text**\/\*;q=0.3, **text/html**;q=0.7, **text/html;level=1**,
+  **text/html;level=2**;q=0.4, **\*/\***;q=0.5
+
+|    Media Type     | Quality |
+| :---------------: | :-----: |
+| text/html;level=1 |    1    |
+|     text/html     |   0.7   |
+|    text/plain     |   0.3   |
+|    image/jpeg     |   0.5   |
+| text/html;level=2 |   0.4   |
+| text/html;level=3 |   0.7   |
+
+## 전송 방식
+
+### 단순 전송 - Content-Length
+
+요청
+
+```http
+GET /event
+```
+
+응답
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html;charset=UTF-8
+Content-Length: 3423
+
+<html>
+ <body>...</body>
+</html>
+```
+
+### 압축 전송 - Content-Encoding
+
+요청
+
+```http
+GET /event
+```
+
+응답
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html;charset=UTF-8
+Content-Encoding: gzip
+Content-Length: 521
+
+lkj123kljoiasudlkjaweioluywlnfdo912u34ljko98udjkl
+```
+
+### 분할 전송 - Transfer-Encoding
+
+요청
+
+```http
+GET /event
+```
+
+응답
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/plain
+Transfer-Encoding: chunked
+
+5
+Hello
+5
+World
+0
+\r\n
+```
+
+- 용량이 큰 경우에 데이터를 쪼개서 보내기 위해 사용
+- 데이터 크기가 예상이 안 되고, 각 데이터와 같이 보내기 때문에 `Content-Length`를 포함하면 안 됨
+- `5 / Hello` 데이터의 바이트 크기와 데이터를 한 묶음으로 보냄
+- `0 \r\n`는 전송이 끝났음을 의미
+
+### 범위 전송 - Range, Content-Range
+
+요청
+
+```http
+GET /event
+Range: bytes=1001-2000
+```
+
+응답
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/plain
+Content-Range: bytes 1001-2000 / 2000
+
+qweqwe1l2iu3019u2oehj1987askjh3q98y
+```
+
+- 이미지나 파일 같은 데이터를 받을 때, 중간에 연결이 끊어져서 처음부터 다시 받으면 비효율적임
+- 범위를 지정해서 남은 부분부터 다시 받을 수 있음
+
+## 일반 정보
+
+### 요청
+
+#### From
+
+- 유저 에이전트의 이메일 정보
+- 일반적으로 잘 사용되지 않고, 검색 엔진에서 주로 사용
+
+#### Referer
+
+- 현재 요청된 페이지의 이전 웹 페이지 주소
+- 참고: referer는 referrer의 오타
+
+#### User-Agent
+
+- 클라이언트 어플리케이션 정보, e.g., 웹 브라우저
+
+### 응답
+
+#### Server
+
+- 요청을 처리하는 Origin 서버의 소프트웨어 정보
+
+#### Date
+
+- 메시지가 발생한 날짜와 시간
+
+## 특별한 정보
+
+### 요청
+
+#### Host
+
+- 요청하는 호스트 정보(도메인)
+- 하나의 서버가 여러 도메인을 처리해야 할 때 구분을 위해 **필수!**
+
+### 응답
+
+#### Location
+
+- 페이지 리다이렉션
+- 3xx 응답 결과에 Location 헤더가 있으면, 브라우저는 Location으로 자동 이동(리다이렉트)
+- 201 Created에서 Location 값은 요청에 의해 생성된 리소스 RUI
+
+#### Allow
+
+- 허용 가능한 HTTP 메서드
+- 405 Method Not Allowed에서 응답에 포함해야 함.
+
+#### Retry-After
+
+- 유저 에이전트가 다음 요청을 하기까지 기다려야 하는 시간
+- 503 Service Unavailable에서 서비스가 언제까지 불능인지 알려줄 수 있음
+
+## 인증
+
+### Authorization
+
+- 클라이언트 인증 정보를 전달
+- Authorization: Basic xxxxxxxxxxxxxxxx
+
+### WWW-Authenticate
+
+- 리소스 접근시 필요한 인증 방법 정의
+- 401 Unauthorized 응답과 함께 사용
+
+## 쿠키
+
+- Set-Cookie: 서버에서 클라이언트로 쿠키 전달(응답)
+- Cookie: 클라이언트가 서버에서 받은 쿠키를 저장하고, 요청시 서버로 전달
+
+### 쿠키를 왜 사용해야 하는가?
+
+로그인이 필요한 서비스를 이용할 때, 쿠키가 없다면 HTTP는 무상태(Stateless) 프로토콜이기 때문에 매번 로그인 정보(e.g., 아이디, 패스워드)를 서버에 전달해야 한다.
+
+만약 사용자가 창을 닫기라도 한다면 매번 다시 로그인을 해야 한다. 이를 해결하기 위한 웹 브라우저의 내부 저장소 중에 하나가 **쿠키**다.
+
+### 특징
+
+- 사용처
+
+  - 사용자 로그인 세션 관리
+  - 광고 정보 트래킹
+
+- 쿠키 정보는 항상 서버에 전송됨
+
+  - 최소한의 정보만 사용(세션 ID, 인증 토큰)
+  - 서버에 전송하진 않고, 웹 브라우저 내부에만 데이터를 저장하고 싶다면 웹 스토리지 검토
+
+- 보안에 민감한 정보는 저장하면 안 됨
+  - E.g., 주민번호, 신용카드 번호 등
+
+### 생명주기
+
+> Expires, max-age
+
+- Set-Cookie: **expires**=Tue, 08-Feb-2022 16:21:27 GMT
+  - 만료일이 되면 쿠키 삭제
+- Set-Cookie: max-age=600
+  - 600초가 지나면 쿠키 삭제
+  - 0이나 음수 지정하면 즉시 쿠키 삭제
+- 세션 쿠키: 만료 날짜를 생략하면 브라우저 종료시까지만 유지
+- 영속 쿠기: 만료 날짜를 지정하면 해당 날짜까지 유지
+
+### 도메인
+
+> Domain
+
+- E.g., domain=google.com
+- 명시: 명시한 도메인 + 서브 도메인
+
+  - domain=google.com을 지정해서 쿠키 생성하면 google.com은 물론 sub.google.com에서도 쿠키 접근 가능
+
+- 생략: 현재 도메인만 적용
+  - google.com에서 domain 지정 없이 쿠키를 생성하면 google.com에서만 쿠키 접근이 가능하고, sub.google.com에서는 접근할 수 없음
+
+### 경로
+
+> Path
+
+- E.g., path=/home
+- 지정한 경로를 포함한 하위 경로에서만 쿠키 접근 가능
+- 일반적으로 path=/ 처럼 루트로 지정
+
+### 보안
+
+> Secure, HttpOnly, SameSite
+
+- Secure
+  - 쿠키는 기본적으로 http, https를 구분하지 않고 전송
+  - Secure를 적용하면 https인 경우에만 전송
+- HttpOnly
+  - XSS 공격 방지
+  - 자바스크립트에서 접근 불가, e.g., `document.cookie`
+  - HTTP 전송에만 사용
+- SameSite
+  - XSRF 공격 방지
+  - 요청 도메인과 쿠키에 설정된 도메인이 같은 경우에만 쿠키 전송
