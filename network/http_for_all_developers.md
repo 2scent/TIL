@@ -298,7 +298,7 @@ HTTP-message  = start-line
 
 ### 시작 라인
 
-#### 요청 메시지
+#### 요청
 
 ```http
 GET /search?q=hello&hl=ko HTTP/1.1
@@ -309,7 +309,7 @@ GET /search?q=hello&hl=ko HTTP/1.1
 - 요청 대상: 일반적으로 "/"로 시작하는 절대 경로 - /search?q=hello&hl=ko
 - HTTP Version - HTTP/1.1
 
-#### 응답 메시지
+#### 응답
 
 ```http
 HTTP/1.1 200 OK
@@ -1168,3 +1168,189 @@ qweqwe1l2iu3019u2oehj1987askjh3q98y
 - SameSite
   - XSRF 공격 방지
   - 요청 도메인과 쿠키에 설정된 도메인이 같은 경우에만 쿠키 전송
+
+# HTTP 헤더 2 - 캐시와 조건부 요청
+
+## 캐시 기본 동작
+
+### 캐시가 없다면?
+
+- 데이터가 변경되지 않아도 매번 네트워크를 통해 데이터를 다운받아야 한다.
+- 네트워크는 느리고 비싸다.
+- 로딩 속도가 느려지므로, 느린 사용자 경험
+
+### 캐시 효과
+
+- 캐시 유효 시간 동안은 네트워크 필요 없이 캐시에서 가져오면 된다.
+- 비싼 네트워크 사용량을 줄일 수 있다.
+- 로딩 속도가 빨라지므로, 빠른 사용자 경험
+
+### 캐시 시간 초과
+
+- 캐시 유효 시간이 지나면, 네트워크를 통해 다시 데이터를 받아와서 캐시를 갱신
+
+## 검증 헤더와 조건부 요청 1
+
+### 캐시 유효 시간이 초과한 경우
+
+1. 서버의 데이터가 변경
+2. 서버의 데이터가 그대로
+
+   - 데이터가 그대로라면 캐시를 재사용할 수 있음
+   - 캐시의 데이터와 서버의 데이터가 같은지 확인 작업 필요
+
+### 검증 헤더 추가
+
+#### 첫 번째 요청
+
+```http
+HTTP/1.1 200 OK
+Content-Type: image/jpeg
+cache-control: max-age=60
+Last-Modified: 2022년 2월 10일 10:00:00
+Content-Length: 34012
+
+lkj123kljoiasudlkjaweioluywlnfdo912u34ljko98udjklasl
+kjdfl;qkawj9;o4ruawsldkal;skdjfa;ow9ejkl3123123
+```
+
+- 첫 번째 요청에서 위와 같은 응답을 받으면 `max-age`(캐시 유효 시간)와 `Last-Modified`(데이터 최종 수정일)를 데이터와 함께 캐시에 저장한다.
+
+#### 두 번째 요청 - 캐시 시간 초과
+
+##### 요청
+
+```http
+GET /star.jpg
+if-modified-since: 2022년 2월 10일 10:00:00
+```
+
+##### 응답
+
+```http
+HTTP/1.1 304 Not Modified
+Content-Type: image/jpeg
+cache-control: max-age=60
+Last-Modified: 2022년 2월 10일 10:00:00
+Content-Length: 34012
+
+```
+
+- 두 번째 요청에서 캐시 시간이 초과했다면, 저장해놨던 *데이터 최종 수정일*을 `if-modified-since` 헤더에 담아 보낸다.
+- *데이터 최종 수정일*이 서버의 값과 같다면 데이터가 그대로이므로 새로 다운받을 필요 없이 캐시의 데이터를 사용하면 된다.
+  - 유효 시간은 갱신한다.
+
+### 정리
+
+- 캐시 유효 시간이 초과해도, 서버 데이터가 변경되지 않았다면
+  - 304 Not Modified + 헤더 메타 정보만 응답(바디 X)
+  - 클라이언트는 헤더 메타 정보만 갱신하고, 캐시 데이터 재사용
+
+## 검증 헤더와 조건부 요청 2
+
+- 검증 헤더
+  - 캐시 데이터와 서버 데이터가 같은지 검증
+    - Last-Modified
+    - ETag
+- 조건부 요청 헤더
+  - If-Modified-Since: Last-Modified
+  - If-None-Match: ETag
+  - 조건이 만족하면 200 OK
+  - 조건이 만족하지 않으면 304 Not Modified
+
+### If-Modified-Since: Last-Modified
+
+- 데이터 미변경 예시
+
+  - 캐시: 2022년 2월 10일 10:00:00 vs 서버: 2022년 2월 10일 10:00:00
+  - **304 Not Modified**, 헤더 데이터만 전송(BODY 미포함)
+  - 전송 용량 0.1M (헤더 0.1M, 바디 1.0M)
+
+- 데이터 변경 예시
+  - 캐시: 2022년 2월 10일 10:00:00 vs 서버: 2022년 2월 10일 **11**:00:00
+  - **200 OK**, 모든 데이터 전송(BODY 포함)
+  - 전송 용량 1.1M (헤더 0.1M, 바디 1.0M)
+
+### If-None-Match: ETag
+
+- ETag(Entity Tag)
+- 캐시용 데이터에 고유한 이름을 달아둠
+  - E.g., Etag: "v1.0", Etag: "f3943ajfd3"
+- 데이터가 변경되면 이름을 변경(Hash를 재생성)
+  - E.g., Etag: "v1.0" -> Etga: "v2.0"
+- Etag가 같으면 유지, 다르면 다시 받기
+- 캐시 제어 로직을 서버에서 완전히 관리할 수 있음
+
+## 캐시와 조건부 요청 헤더
+
+### Cache-Control - 캐시 지시어(directives)
+
+- Cache-Control: max-age
+  - 캐시 유효 시간, 초 단위
+- Cache-Control: no-cache
+  - 캐시는 해도 되지만, 항상 origin 서버에 검증하고 사용
+- Cache-Control: no-store
+  - 민감한 정보이므로 캐시에 저장하면 안 됨
+
+### Pragma - 캐시 제어(하위 호환)
+
+- Pragma: no-cache
+- HTTP 1.0 하위 호환
+
+### Expires - 캐시 만료일 지정(하위 호환)
+
+- expires: Mon, 01 Jan 1990 00:00:00 GMT
+- 캐시 만료일을 정확한 날짜로 지정
+- 더 유연한 Cache-Control 사용을 권장
+- Cache-Control: max-age와 함께 사용하면 무시됨
+
+### 검증 헤더와 조건부 요청 헤더
+
+- 검증 헤더
+  - Etag
+  - Last-Modified
+- 조건부 요청 헤더
+  - If-Match, If-None-Match: ETag 값 사용
+  - If-Modified-Since, If-Unmodified-Since: Last-Modified 값 사용
+
+## 프록시 캐시
+
+- 한국에서 미국에 있는 서버에 접근하려면 거리만큼 오랜 시간이 걸림
+- 이 시간을 줄이기 위해 보다 가까운 곳(e.g., 한국)에 캐시를 두는 것을 **프록시 캐시 서버**라고 함
+- 클라이언트 웹 브라우저에 있는 캐시를 private 캐시, 프록시 캐시 서버를 public 캐시라고도 함
+
+### Cache-Control - 캐시 지시어(directives) 기타
+
+- Cache-Controler: public
+  - 응답이 public 캐시에 저장되어도 됨
+- Cache-Controler: private
+  - 응답은 private 캐시에만 저장돼야 함
+  - 기본값
+- Cache-Control: s-maxage
+  - 프록시 캐시에만 적용되는 max-age
+- Age: 60
+  - HTTP 헤더
+  - origin 서버에서 받은 응답이 프록시 캐시에 머문 시간(초 단위)
+
+## 캐시 무효화
+
+### Cache-Control - 확실한 캐시 무효화 응답
+
+- Cache-Control: no-cache, no-store, must-revalidate
+- Pragma: no-cache
+  - HTTP 1.0 하위 호환
+
+#### Cache-Control - 캐시 지시어(directives) 확실한 캐시 무효화
+
+- must-revalidate
+
+  - 캐시 만료후 최초 조회시 원 서버에 검증해야함
+  - 원 서버 접근 실패시 반드시 오류가 발생해야함 - 504(Gateway Timeout)
+  - 캐시 유효 시간이라면 캐시를 사용함
+
+### no-cache vs must-revalidate
+
+- no-cache는 origin 서버에 접근할 수 없을 때, 캐시 서버 설정에 따라 캐시 데이터를 반환할 수 있음
+  - Error or 200 OK
+- must-revalidate는 origin 서버에 접근할 수 없다면 항상 오류가 발생해야 함
+  - 504 Gateway Timeout
