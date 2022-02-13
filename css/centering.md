@@ -1,4 +1,4 @@
-# Centring
+# Centering
 
 > flexbox를 사용하지 않고 중앙 정렬하는 방법
 
@@ -39,7 +39,7 @@
 
 블록 요소는 기본적으로 남은 공간을 `margin`으로 채우기 때문에 예제와 같은 방법으로 `margin-left`와 `margin-right` 속성에 `auto`를 지정해주면 된다.
 
-## translate
+## transform(translate)
 
 ```html
 <div class="container">
