@@ -31,7 +31,8 @@
 ```css
 .item {
   margin: 0 auto;
-  /* 예제를 위한 속성들 */
+
+  /* 디자인 속성 */
   text-align: center;
   width: 400px;
 }
@@ -51,7 +52,7 @@
 .container {
   position: relative;
 
-  /* 디자인 요소 */
+  /* 디자인 속성 */
   width: 1000px;
   height: 1000px;
   background-color: red;
@@ -63,7 +64,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
 
-  /* 디자인 요소 */
+  /* 디자인 속성 */
   width: 200px;
   height: 200px;
   background-color: blue;
