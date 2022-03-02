@@ -72,6 +72,6 @@ p {
 
 하위 선택자에서 같은 이름의 변수를 다시 선언한다면 하위 선택자의 변수가 우선되어 *첫 번째 단락*은 **파란색**, *두 번째 단락*은 **빨간색**으로 표시된다.
 
-# 참조
+## 참조
 
 - [사용자 지정 CSS 속성 사용하기 (변수)](https://developer.mozilla.org/ko/docs/Web/CSS/Using_CSS_custom_properties)
