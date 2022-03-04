@@ -109,7 +109,7 @@ class _SomethingWidgetState extends State<SomethingWidget> {
 }
 ```
 
-앞서 정의한 `MeasuredSize` 위젯을 이용하면 `StatefulWidget`의 `setState()`를 이용해서 동적인 `Header`의 **높이**를 `SliverAppBar`의 `toobarHeight`에 전달할 수 있다.
+앞서 정의한 `MeasuredSize` 위젯과 `StatefulWidget`의 `setState()`를 이용해서 동적인 `Header`의 **높이**를 `SliverAppBar`의 `toobarHeight`에 전달할 수 있다.
 
 ## 참고
 
