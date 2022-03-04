@@ -8,7 +8,7 @@
 | :------------------------------------------------------------: | :-----------------------------------------------------------------: |
 | ![기본 화면](images/sliver_app_bar_with_dynamic_height_01.png) | ![스크롤 됐을 때](images/sliver_app_bar_with_dynamic_height_02.png) |
 
-구현하고자 하는 UI는 위 사진들처럼 기본적으로 `Header`, `TabBar`, `TabBarView`가 모두 보이다가 아래로 스크롤 하면 `Header`가 사라지고, 다시 위로 스크롤 하면 `Header`가 나타나는 구조다.
+구현하고자 하는 UI는 기본적으로 `Header`, `TabBar`, `TabBarView`가 모두 보이다가 아래로 스크롤 하면 `Header`가 사라지고, 다시 위로 스크롤 하면 `Header`가 나타나는 구조다.
 
 ## 기본적인 방법
 
@@ -24,11 +24,11 @@ Widget build(BuildContext context) {
 }
 ```
 
-위와 같이 `NestedScrollView`를 이용하면 원하는 UI를 어렵지 않게 만들 수 있다.
+`NestedScrollView`를 이용하면 원하는 UI를 어렵지 않게 구현할 수 있다.
 
 ## Header의 높이가 동적이라면?
 
-`Header`를 감싸는 `SliverAppBar`는 `toolbarHeight` 속성으로 높이를 설정할 수 있는데 `Header`의 _높이_ 가 동적이라면 `Header`의 _높이_ 에 맞게 `toobarHeight` 속성을 지속적으로 변경해줘야 한다.
+`Header`를 감싸는 `SliverAppBar`는 `toolbarHeight` 속성으로 높이를 설정할 수 있는데 `Header`의 **높이**가 동적이라면 `Header`의 **높이**에 맞게 `toobarHeight` 속성을 지속적으로 변경해줘야 한다.
 
 ```dart
 
@@ -109,7 +109,7 @@ class _SomethingWidgetState extends State<SomethingWidget> {
 }
 ```
 
-앞서 정의한 `MeasuredSize` 위젯을 이용하면 `StatefulWidget`의 `setState()`를 이용해서 동적인 `Header`의 높이를 `SliverAppBar`의 `toobarHeight`에 전달할 수 있다.
+앞서 정의한 `MeasuredSize` 위젯을 이용하면 `StatefulWidget`의 `setState()`를 이용해서 동적인 `Header`의 **높이**를 `SliverAppBar`의 `toobarHeight`에 전달할 수 있다.
 
 ## 참고
 
