@@ -25,6 +25,6 @@
 
 - [모든 개발자를 위한 HTTP 웹 기본 지식](network/http_for_all_developers.md)
 
-## Data Structure
+## Data Structure and Algorithm
 
-- [기본 자료구조](data-structure/base-data-structure.md)
+- [알고리즘 / 기술면접 완전 정복 올인원](data-structure-and-algorithm/algorithm-technical-interview-all-in-one.md)
