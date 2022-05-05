@@ -28,3 +28,4 @@
 ## Data Structure and Algorithm
 
 - [알고리즘 / 기술면접 완전 정복 올인원](data-structure-and-algorithm/algorithm-technical-interview-all-in-one.md)
+- [어서와! 자료구조와 알고리즘은 처음이지?](data-structure-and-algorithm/programmers-data-structure-and-algorithm-with-python.md)
