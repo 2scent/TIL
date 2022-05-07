@@ -175,7 +175,7 @@ def recursive_binary_search(L, x, lower, upper):
 
 ## Big-O Notation
 
-- 점근 표기법의 하나
+- 점근 표기법 중의 하나
 - 알고리즘의 복잡도를 표현할 때 흔히 쓰임
 - 입력의 크기가 n일 때 비례, 계수는 별로 중요하지 않음
 
