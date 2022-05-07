@@ -162,7 +162,7 @@ def recursive_binary_search(L, x, lower, upper):
         return recursive_binary_search(L, x, middle + 1, upper)
 ```
 
-# 알고리즘 복잡도 (Complexit of Algorithm)
+# 알고리즘 복잡도 (Complexity of Algorithm)
 
 - 시간 복잡도 (Time Complexity)
   - 문제의 크기와 이를 해결하는 데 걸리는 시간 사이의 관계
@@ -192,11 +192,11 @@ def recursive_binary_search(L, x, lower, upper):
 
 ### 이차 시간 알고리즘 - O(n<sup>2</sup>)
 
-- e.g., 삽입 정렬 (insertion sort)
+- e.g., 삽입 정렬 (Insertion Sort)
   - Best case: O(n)
   - Worst case: O(n<sup>2</sup>)
 
 ### 보다 낮은 복잡도를 가지는 정렬 알고리즘
 
-- e.g., 병합 정렬 (merge sort) - O(nlogn)
+- e.g., 병합 정렬 (Merge Sort) - O(nlogn)
   - 정렬 문제에 대해 O(nlogn)보다 낮은 복잡도를 갖는 알고리즘은 없다는 게 수학적으로 증명됨
