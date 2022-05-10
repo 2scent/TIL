@@ -238,12 +238,6 @@ class Node:
 - 예시에서 첫 인덱스는 0이 아닌 1
 
 ```python
-class Node:
-    def __init__(self, item):
-        self.data = item
-        self.next = None
-
-
 class SinglyLinkedList:
     def __init__(self):
         self.node_count = 0
