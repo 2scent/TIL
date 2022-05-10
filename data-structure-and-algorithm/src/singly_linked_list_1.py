@@ -4,12 +4,26 @@ class Node:
         self.next = None
 
 
-class LinkedList:
+class SinglyLinkedList:
     def __init__(self):
         self.node_count = 0
         self.head = None
         self.tail = None
 
+    # 리스트 순회
+    def traverse(self):
+        result = []
+        cur = self.head
+        while cur:
+            result.append(cur.data)
+            cur = cur.next
+        return result
+
+    # 리스트 길이 반환
+    def get_length(self):
+        return self.node_count
+
+    # 특정 원소 참조
     def get_at(self, pos):
         if pos <= 0 or pos > self.node_count:
             return None
@@ -21,20 +35,7 @@ class LinkedList:
             i += 1
         return cur
 
-    def get_length(self):
-        return self.node_count
-
-    def traverse(self):
-        result = []
-
-        cur = self.head
-
-        while cur:
-            result.append(cur.data)
-            cur = cur.next
-
-        return result
-
+    # 원소 삽입
     def insert_at(self, pos, new_node):
         if pos < 1 or pos > self.node_count + 1:
             return False
@@ -56,6 +57,7 @@ class LinkedList:
         self.node_count += 1
         return True
 
+    # 원소 삭제
     def pop_at(self, pos):
         if pos < 1 or pos > self.node_count:
             raise IndexError
@@ -75,6 +77,7 @@ class LinkedList:
         self.node_count -= 1
         return cur.data
 
+    # 리스트 병합
     def concat(self, L):
         self.tail.next = L.head
         if L.tail:
