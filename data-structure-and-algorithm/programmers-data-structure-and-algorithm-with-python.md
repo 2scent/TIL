@@ -449,8 +449,8 @@ class Node:
 
 ### DoublyLinkedList
 
-- 처음와 끝에 dummy node
-- 데이터를 담고 있는 node 들은 모두 같은 모양
+- 처음와 끝에 더미 노드
+- 데이터를 담고 있는 노드들은 모두 같은 모양
 
 ```python
 class DoublyLinkedList:
