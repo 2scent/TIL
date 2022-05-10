@@ -177,7 +177,8 @@ def recursive_binary_search(L, x, lower, upper):
 
 - 점근 표기법 중의 하나
 - 알고리즘의 복잡도를 표현할 때 흔히 쓰임
-- 입력의 크기가 n일 때 비례, 계수는 별로 중요하지 않음
+- 입력의 크기가 n일 때, 얼마나 비례하는지 나타냄
+- 계수는 별로 중요하지 않음
 
 ### 선형 시간 알고리즘 - O(n)
 
@@ -200,3 +201,372 @@ def recursive_binary_search(L, x, lower, upper):
 
 - e.g., 병합 정렬 (Merge Sort) - O(nlogn)
   - 정렬 문제에 대해 O(nlogn)보다 낮은 복잡도를 갖는 알고리즘은 없다는 게 수학적으로 증명됨
+
+# 연결 리스트 (Linked List)
+
+## 추상 자료형 (Abstract Data Type)
+
+- Data
+  - e.g., 정수, 문자열, 레코드 등
+- Operations
+  - 삽입, 삭제, 순회 등
+  - 정렬, 탐색 등
+
+## 단일 연결 리스트 (Singly Linked List)
+
+![단일 연결 리스트](images/singly-linked-list.png)
+
+### Node
+
+- Data
+  - e.g., 문자열, 레코드, 또 다른 연결 리스트 등
+- Link (next)
+
+```python
+class Node:
+    def __init__(self, item):
+        self.data = item
+        self.next = None
+```
+
+### SinglyLinkedList
+
+- Properties
+  - 첫 노드를 가리키는 `head`
+  - 마지막 노드를 가리키는 `tail`
+  - 총 노드의 수
+- 예시에서 첫 인덱스는 0이 아닌 1
+
+```python
+class Node:
+    def __init__(self, item):
+        self.data = item
+        self.next = None
+
+
+class SinglyLinkedList:
+    def __init__(self):
+        self.node_count = 0
+        self.head = None
+        self.tail = None
+
+    # 리스트 순회
+    def traverse(self):
+        result = []
+        cur = self.head
+        while cur:
+            result.append(cur.data)
+            cur = cur.next
+        return result
+
+    # 리스트 길이 반환
+    def get_length(self):
+        return self.node_count
+
+    # 특정 원소 참조
+    def get_at(self, pos):
+        if pos <= 0 or pos > self.node_count:
+            return None
+
+        i = 1
+        cur = self.head
+        while i < pos:
+            cur = cur.next
+            i += 1
+        return cur
+
+    # 원소 삽입
+    def insert_at(self, pos, new_node):
+        if pos < 1 or pos > self.node_count + 1:
+            return False
+
+        if pos == 1:
+            new_node.next = self.head
+            self.head = new_node
+        else:
+            if pos == self.node_count + 1:
+                prev = self.tail
+            else:
+                prev = self.get_at(pos - 1)
+            new_node.next = prev.next
+            prev.next = new_node
+
+        if pos == self.node_count + 1:
+            self.tail = new_node
+
+        self.node_count += 1
+        return True
+
+    # 원소 삭제
+    def pop_at(self, pos):
+        if pos < 1 or pos > self.node_count:
+            raise IndexError
+
+        if pos == 1:
+            cur = self.head
+            self.head = cur.next
+            if self.node_count == 1:
+                self.tail = self.head
+        else:
+            prev = self.get_at(pos - 1)
+            cur = prev.next
+            prev.next = cur.next
+            if pos == self.node_count:
+                self.tail = prev
+
+        self.node_count -= 1
+        return cur.data
+
+    # 리스트 병합
+    def concat(self, L):
+        self.tail.next = L.head
+        if L.tail:
+            self.tail = L.tail
+        self.node_count += L.node_count
+```
+
+### 배열과 비교
+
+|                |       배열       |      연결 리스트       |
+| :------------: | :--------------: | :--------------------: |
+|   저장 공간    |   연속한 위치    |      임의의 위치       |
+| 특정 원소 참조 | 매우 간편 - O(1) | 선형탐색과 유사 - O(n) |
+
+### 삽입의 시간 복잡도
+
+- 맨 앞에 삽입하는 경우: O(1)
+- 중간에 삽입하는 경우: O(n)
+- 맨 끝에 삽입하는 경우: O(1)
+  - `tail` 덕분
+
+### 삭제의 시간 복잡도
+
+- 맨 앞에 삭제하는 경우: O(1)
+- 중간에 삭제하는 경우: O(n)
+- 맨 끝에 삭제하는 경우: O(n)
+
+### 연결 리스트의 강점
+
+- 삽입과 삭제가 유연함
+- 이를 위해 새로운 메서드들을 추가
+  - `insert_after(prev, new_node)`
+  - `pop_after(prev)`
+- 맨 앞의 노드를 해결하기 위해 더미 노드를 추가
+
+```python
+class SinglyLinkedList:
+    def __init__(self):
+        self.node_count = 0
+        self.head = Node(None)  # dummy node
+        self.tail = None
+        self.head.next = self.tail
+
+    # 리스트 순회
+    def traverse(self):
+        result = []
+        cur = self.head
+        while cur.next:
+            cur = cur.next
+            result.append(cur.data)
+        return result
+
+    # 리스트 길이 반환
+    def get_length(self):
+        return self.node_count
+
+    # 특정 원소 참조
+    def get_at(self, pos):
+        if pos < 0 or pos > self.node_count:
+            return None
+
+        i = 0
+        cur = self.head
+        while i < pos:
+            cur = cur.next
+            i += 1
+        return cur
+
+    # 특정 원소 다음에 원소 삽입
+    def insert_after(self, prev, new_node):
+        new_node.next = prev.next
+        if prev.next is None:
+            self.tail = new_node
+        prev.next = new_node
+        self.node_count += 1
+        return True
+
+    # 특정 원소 삽입
+    def insert_at(self, pos, new_node):
+        if pos < 1 or pos > self.node_count + 1:
+            return False
+
+        if pos != 1 and pos == self.node_count + 1:
+            prev = self.tail
+        else:
+            prev = self.get_at(pos - 1)
+        return self.insert_after(prev, new_node)
+
+    # 특정 원소 다음의 원소 삭제
+    def pop_after(self, prev):
+        if prev.next is None:
+            return None
+
+        cur = prev.next
+        prev.next = cur.next
+        if cur.next is None:
+            self.tail = prev
+        self.node_count -= 1
+
+        return cur.data
+
+    # 특정 원소 삭제
+    def pop_at(self, pos):
+        if pos < 1 or pos > self.node_count:
+            raise IndexError
+
+        return self.pop_after(self.get_at(pos - 1))
+
+    # 리스트 병합
+    def concat(self, L):
+        self.tail.next = L.head.next
+        if L.tail:
+            self.tail = L.tail
+        self.node_count += L.node_count
+```
+
+## 양방향 연결 리스트 (Doubly Linked List)
+
+- 한쪽이 아닌 양쪽으로 링크 연결
+- **정방향, 역방향 둘다 진행 가능**
+
+![양방향 연결 리스트](images/doubly-linked-list.png)
+
+### Node
+
+- 이전 노드를 가리키는 `prev` 추가
+
+```python
+class Node:
+    def __init__(self, item):
+        self.data = item
+        self.prev = None
+        self.next = None
+```
+
+### DoublyLinkedList
+
+- 처음와 끝에 dummy node
+- 데이터를 담고 있는 node 들은 모두 같은 모양
+
+```python
+class DoublyLinkedList:
+    def __init__(self):
+        self.node_count = 0
+        self.head = Node(None)
+        self.tail = Node(None)
+        self.head.prev = None
+        self.head.next = self.tail
+        self.tail.prev = self.head
+        self.tail.next = None
+
+    # 리스트 정방향 순회
+    def traverse(self):
+        result = []
+        cur = self.head
+        while cur.next.next:
+            cur = cur.next
+            result.append(cur.data)
+        return result
+
+    # 리스트 역방향 순회
+    def reverse(self):
+        result = []
+        cur = self.tail
+        while cur.prev.prev:
+            cur = cur.prev
+            result.append(cur.data)
+        return result
+
+    # 특정 원소 참조
+    def get_at(self, pos):
+        if pos <= 0 or pos > self.node_count:
+            return None
+
+        if pos > self.node_count // 2:  # 찾고자 하는 원소가 뒤쪽에 있으면 tail부터 찾음
+            i = 0
+            cur = self.tail
+            while i < self.node_count - pos + 1:
+                cur = cur.prev
+                i += 1
+        else:
+            i = 0
+            cur = self.head
+            while i < pos:
+                cur = cur.next
+                i += 1
+        return cur
+
+    # 특정 원소 다음에 원소 삽입
+    def insert_after(self, prev, new_node):
+        next = prev.next
+        new_node.prev = prev
+        new_node.next = next
+        prev.next = new_node
+        next.prev = new_node
+        self.node_count += 1
+        return True
+
+    # 특정 원소 이전에 원소 삽입
+    def insert_before(self, next, new_node):
+        prev = next.prev
+        new_node.prev = prev
+        new_node.next = next
+        prev.next = new_node
+        next.prev = new_node
+        self.node_count += 1
+        return True
+
+    # 특정 원소 삽입
+    def insert_at(self, pos, new_node):
+        if pos < 1 or pos > self.node_count + 1:
+            return False
+
+        return self.insert_after(self.get_at(pos - 1), new_node)
+
+    # 특정 원소 다음 원소 삭제
+    def pop_after(self, prev):
+        cur = prev.next
+        next = cur.next
+        prev.next = next
+        next.prev = prev
+
+        self.node_count -= 1
+
+        return cur.data
+
+    # 특정 원소 이전 원소 삭제
+    def pop_before(self, next):
+        cur = next.prev
+        prev = cur.prev
+        prev.next = next
+        next.prev = prev
+
+        self.node_count -= 1
+
+        return cur.data
+
+    # 특정 원소 삭제
+    def pop_at(self, pos):
+        if pos < 1 or pos > self.node_count:
+            raise IndexError
+
+        return self.pop_after(self.get_at(pos - 1))
+
+    # 리스트 병합
+    def concat(self, L):
+        self.tail.prev.next = L.head.next
+        L.head.next.prev = self.tail.prev
+        self.tail = L.tail
+
+        self.node_count += L.node_count
+```
