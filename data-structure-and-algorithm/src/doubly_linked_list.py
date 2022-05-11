@@ -33,6 +33,10 @@ class DoublyLinkedList:
             result.append(cur.data)
         return result
 
+    # 리스트 길이 반환
+    def get_length(self):
+        return self.node_count
+
     # 특정 원소 참조
     def get_at(self, pos):
         if pos <= 0 or pos > self.node_count:

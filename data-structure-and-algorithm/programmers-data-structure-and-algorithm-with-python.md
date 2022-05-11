@@ -564,3 +564,273 @@ class DoublyLinkedList:
 
         self.node_count += L.node_count
 ```
+
+# 스택 (Stack)
+
+- 자료를 보관할 수 있는 선형 구조
+- 넣을 때는 한쪽 끝에서 밀어 넣어야 하고 - Push 연산
+- 꺼낼 때는 같은 쪽에서 뽑아 꺼내야 한다 - Pop 연산
+- 후입선출(LIFO - Last In, First Out)
+
+![스택](images/stack.png)
+
+## 스택에서 발생할 수 있는 오류
+
+- 비어있는 스택에서 데이터를 꺼내려고 할 때 - 스택 언더플로우 (Stack Underflow)
+- 꽉 찬 스택에 데이터를 넣으려 할 때 - 스택 오버플로우 (Stack Overflow)
+
+## 스택의 구현
+
+### 연산의 정의
+
+- `size()` - 현재 스택에 들어있는 데이터 원소의 수를 구함
+- `isEmpty()` - 현재 스택이 비어 있는지 판단
+- `push(x)` - 데이터 원소 x를 스택에 추가
+- `pop()` - 스택의 맨 위에 저장된 데이터 원소를 제거 및 반환
+- `peek()` - 스택의 맨 위에 저장된 데이터 원소를 반환(제거하지 않음)
+
+### 배열(파이썬의 리스트)을 이용한 구현
+
+```python
+class ArrayStack:
+    def __init__(self):
+        self.data = []
+
+    def size(self):
+        return len(self.data)
+
+    def is_empty(self):
+        return self.size() == 0
+
+    def push(self, item):
+        self.data.append(item)
+
+    def pop(self):
+        return self.data.pop()
+
+    def peek(self):
+        return self.data[-1]
+```
+
+### 연결 리스트를 이용한 구현
+
+> 연결 리스트 관련 코드는 [doubly_linked_list.py](src/doubly_linked_list.py) 참고
+
+```python
+class LinkedListStack:
+    def __init__(self):
+        self.data = DoublyLinkedList()
+
+    def size(self):
+        return self.data.get_length()
+
+    def is_empty(self):
+        return self.size() == 0
+
+    def push(self, item):
+        node = Node(item)
+        self.data.insert_at(self.size() + 1, node)
+
+    def pop(self):
+        return self.data.pop_at(self.size())
+
+    def peek(self):
+        return self.data.get_at(self.size()).data
+```
+
+## 수식의 후위 표기법
+
+### 중위 표기법 (Infix Notation)
+
+- 연산자가 피연사자들의 **사이**에 위치
+- e.g., (A + B) \* (C + D)
+
+### 후위 표기법 (Postfix Notation)
+
+- 연산자가 피연산자들의 **뒤**에 위치
+- e.g., A B + C D + \*
+
+### 중위 표기법 -> 후위 표기법 예시
+
+- **_A \* B + C_** -> **_A B \* C +_**
+- **_A + B \* C_** -> **_A B C \* +_**
+- **_A + B + C_** -> **_A B + C +_**
+- **_(A + B) \* C_** -> **_A B + C \*_**
+- **_A \* (B + C)_** -> **_A B C + \*_**
+- **_(A + B) \* (C + D)_** -> **_A B + C D + \*_**
+- **_(A + (B - C)) \* D_** -> **_A B C - + D \*_**
+- **_A \* (B - (C + D))_** -> **_A B C D + - \*_**
+
+### 중위 표기법 -> 후위 표기법 알고리즘 설계 및 구현
+
+1. 연산자의 우선 순위 설정
+2. 중위 표현식을 왼쪽부터 한 글자씩 읽어서
+   1. 피연산자면 그냥 출력
+   2. '('일 경우, 스택에 Push
+   3. ')'일 경우, '('가 나올 때까지 스택에서 Pop
+   4. 연산자면 스택에서 이보다 높거나 같은 우선순위 것들을 Pop
+   5. 현재 연산자는 스택에 Push
+3. 스택에 남아 있는 연산자는 모두 Pop
+
+> 스택 관련 코드는 [array_stack.py](src/array_stack.py) 참고
+
+```python
+# 1
+precedences = {
+    '*': 3, '/': 3,
+    '+': 2, '-': 2,
+    '(': 1
+}
+
+
+def infix_to_postfix(expr):
+    op_stack = ArrayStack()
+
+    result = ''
+
+    # 2
+    for c in expr:
+        # 2-1
+        if c not in '*/+-()':
+            result += c
+            continue
+
+        # 2-2
+        if c == '(':
+            op_stack.push(c)
+            continue
+
+        # 2-3
+        if c == ')':
+            t = op_stack.pop()
+            while t != '(':
+                result += t
+                t = op_stack.pop()
+            continue
+
+        # 2-4
+        while not op_stack.is_empty() and precedences[op_stack.peek()] >= precedences[c]:
+            result += op_stack.pop()
+
+        # 2-5
+        op_stack.push(c)
+
+    # 3
+    while not op_stack.is_empty():
+        result += op_stack.pop()
+
+    return result
+```
+
+### 후위 표기법 수식 계산 알고리즘 설계 및 구현
+
+1. 후위 표현식을 왼쪽부터 한 글자씩 읽어서
+   1. 피연산자면 스택에 Push
+   2. 연산자를 만나면 스택에서 Pop -> (1), 또 Pop -> (2)
+      - (2) 연산 (1)을 계산하고, 이 결과를 스택에 Push
+2. 수식의 끝에 도달하면 스택에서 Pop -> 이것이 계산 결과
+
+> 스택 관련 코드는 [array_stack.py](src/array_stack.py) 참고
+
+```python
+def split_tokens(expr):
+    tokens = []
+    val = 0
+    val_processing = False
+    for c in expr:
+        if c == ' ':
+            continue
+        if c in '0123456789':
+            val = val * 10 + int(c)
+            val_processing = True
+        else:
+            if val_processing:
+                tokens.append(val)
+                val = 0
+            val_processing = False
+            tokens.append(c)
+    if val_processing:
+        tokens.append(val)
+
+    return tokens
+
+
+def infix_to_postfix(token_list):
+    precedences = {
+        '*': 3,
+        '/': 3,
+        '+': 2,
+        '-': 2,
+        '(': 1,
+    }
+
+    op_stack = ArrayStack()
+    postfix_list = []
+
+    for token in token_list:
+        if type(token) is int:
+            postfix_list.append(token)
+            continue
+
+        if token == '(':
+            op_stack.push(token)
+            continue
+
+        if token == ')':
+            t = op_stack.pop()
+            while t != '(':
+                postfix_list.append(t)
+                t = op_stack.pop()
+            continue
+
+        while not op_stack.is_empty() and precedences[op_stack.peek()] >= precedences[token]:
+            postfix_list.append(op_stack.pop())
+
+        op_stack.push(token)
+
+    while not op_stack.is_empty():
+        postfix_list.append(op_stack.pop())
+
+    return postfix_list
+
+
+def postfix_eval(token_list):
+    val_stack = ArrayStack()
+
+    # 1
+    for token in token_list:
+        # 1-1
+        if type(token) is int:
+            val_stack.push(token)
+            continue
+
+        # 1-2
+        val1 = val_stack.pop()
+        val2 = val_stack.pop()
+
+        if token == '*':
+            val_stack.push(val2 * val1)
+            continue
+
+        if token == '/':
+            val_stack.push(val2 / val1)
+            continue
+
+        if token == '+':
+            val_stack.push(val2 + val1)
+            continue
+
+        if token == '-':
+            val_stack.push(val2 - val1)
+            continue
+
+    # 2
+    return val_stack.pop()
+
+
+def calculate_postfix(expr):
+    tokens = split_tokens(expr)
+    postfix = infix_to_postfix(tokens)
+    val = postfix_eval(postfix)
+    return val
+```
