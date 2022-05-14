@@ -570,7 +570,7 @@ class DoublyLinkedList:
 - 자료를 보관할 수 있는 선형 구조
 - 넣을 때는 한쪽 끝에서 밀어 넣어야 하고 - Push 연산
 - 꺼낼 때는 같은 쪽에서 뽑아 꺼내야 한다 - Pop 연산
-- 후입선출(LIFO - Last In, First Out)
+- 후입선출 (LIFO - Last In, First Out)
 
 ![스택](images/stack.png)
 
@@ -587,7 +587,7 @@ class DoublyLinkedList:
 - `isEmpty()` - 현재 스택이 비어 있는지 판단
 - `push(x)` - 데이터 원소 x를 스택에 추가
 - `pop()` - 스택의 맨 위에 저장된 데이터 원소를 제거 및 반환
-- `peek()` - 스택의 맨 위에 저장된 데이터 원소를 반환(제거하지 않음)
+- `peek()` - 스택의 맨 위에 저장된 데이터 원소를 반환 (제거하지 않음)
 
 ### 배열(파이썬의 리스트)을 이용한 구현
 
@@ -833,4 +833,212 @@ def calculate_postfix(expr):
     postfix = infix_to_postfix(tokens)
     val = postfix_eval(postfix)
     return val
+```
+
+# 큐 (Queue)
+
+- 자료를 보관할 수 있는 선형 구조
+- 넣을 때는 한쪽 끝에서 밀어 넣어야 하고 -> Enqueue 연산
+- 꺼낼 때는 반대 쪽에서 뽑아 꺼내야 한다 -> Dequeue 연산
+- 선입선출 (FIFO - First In, First Out)
+- e.g., 경기장 입장을 기다리는 대기열
+
+![큐](images/queue.png)
+
+## 큐의 구현
+
+### 연산의 정의
+
+- `size()` - 현재 큐에 들어 있는 데이터 원소의 수를 구함
+- `isEmpty()` - 현재 큐가 비어 있는지를 판단
+- `enqueue(x)` - 데이터 원소 x를 큐에 추가
+- `dequeue()` - 큐의 맨 앞에 저장된 데이터 원소를 제거 및 반환
+- `peek()` - 큐의 맨 앞에 저장된 데이터 원소를 반환 (제거하지 않음)
+
+### 배열(파이썬의 리스트)을 이용한 구현
+
+```python
+class ArrayQueue:
+    def __init__(self):
+        self.data = []
+
+    def size(self):
+        return len(self.data)
+
+    def is_empty(self):
+        return self.size() == 0
+
+    def enqueue(self, item):
+        self.data.append(item)
+
+    def dequeue(self):
+        return self.data.pop(0)
+
+    def peek(self):
+        return self.data[0]
+```
+
+### 배열로 구현한 큐의 시간 복잡도
+
+|     연산     | 시간 복잡도 |
+| :----------: | :---------: |
+|   `size()`   |    O(1)     |
+| `is_empty()` |    O(1)     |
+| `enqueue()`  |    O(1)     |
+| `dequeue()`  |  **O(n)**   |
+|   `peek()`   |    O(1)     |
+
+- 배열의 맨 앞 원소를 꺼내려면 그 뒤의 원소들을 순차적으로 앞으로 이동해야 하기 때문에 Dequeue 연산은 O(n)의 시간이 걸림
+
+### 연결 리스트를 이용한 구현
+
+> 연결 리스트 관련 코드는 [doubly_linked_list.py](src/doubly_linked_list.py) 참고
+
+```python
+class LinkedListQueue:
+    def __init__(self):
+        self.data = DoublyLinkedList()
+
+    def size(self):
+        return self.data.get_length()
+
+    def is_empty(self):
+        return self.size() == 0
+
+    def enqueue(self, item):
+        node = Node(item)
+        self.data.insert_at(self.size() + 1, node)
+
+    def dequeue(self):
+        return self.data.pop_at(1)
+
+    def peek(self):
+        return self.data.get_at(1).data
+```
+
+### 연결 리스트로 구현한 큐의 시간 복잡도
+
+|     연산     | 시간 복잡도 |
+| :----------: | :---------: |
+|   `size()`   |    O(1)     |
+| `is_empty()` |    O(1)     |
+| `enqueue()`  |    O(1)     |
+| `dequeue()`  |    O(1)     |
+|   `peek()`   |    O(1)     |
+
+- 연결 리스트를 이용한 큐의 시간 복잡도는 연결 리스트를 어떻게 구현했냐에 따라 달라질 수 있다.
+- 큐의 `enqueue()`, `dequeue()`, `peek()` 연산들은 연결 리스트의 맨 앞뒤 원소에만 접근하기 때문에 연결 리스트의 `head`와 `tail`를 이용해서 **O(1)** 시간에 처리할 수 있다.
+
+### 큐의 활용
+
+- 자료를 생성하는 작업과 그 자료를 이용하는 작업이 비동기적으로 일어나는 경우
+- 자료를 생성하는 작업이 여러 곳에서 일어나는 경우
+- 자료를 이용하는 작업이 여러 곳에서 일어나는 경우
+- 자료를 생성하는 작업과 그 자료를 이용하는 작업이 양쪽 다 여러 곳에서 일어나는 경우
+- 자료를 처리하여 새로운 자료를 생성하고, 나중에 그 자료를 또 처리해야 하는 작업의 경우
+
+## 환형 큐 (Circular Queue)
+
+- **정해진 개수**의 저장 공간을 빙 돌려가며 이용
+
+![환형 큐](images/circular-queue.gif)
+
+### 연산의 정의
+
+- `size()` - 현재 큐에 들어 있는 데이터 원소의 수를 구함
+- `isEmpty()` - 현재 큐가 비어 있는지를 판단
+- **`is_full()` - 큐에 데이터 원소가 꽉 차 있는지를 판단**
+- `enqueue(x)` - 데이터 원소 x를 큐에 추가
+- `dequeue()` - 큐의 맨 앞에 저장된 데이터 원소를 제거 및 반환
+- `peek()` - 큐의 맨 앞에 저장된 데이터 원소를 반환 (제거하지 않음)
+
+### 배열(파이썬의 리스트)을 이용한 구현
+
+```python
+class CircularQueue:
+    def __init__(self, n):
+        self.max_count = n
+        self.data = [None] * n
+        self.count = 0
+        self.front = -1
+        self.rear = -1
+
+    def size(self):
+        return self.count
+
+    def is_empty(self):
+        return self.count == 0
+
+    def is_full(self):
+        return self.count == self.max_count
+
+    def enqueue(self, x):
+        if self.is_full():
+            raise IndexError('Queue is full!')
+
+        self.rear = (self.rear + 1) % self.max_count
+        self.data[self.rear] = x
+        self.count += 1
+
+    def dequeue(self):
+        if self.is_empty():
+            raise IndexError('Queue is empty!')
+
+        self.front = (self.front + 1) % self.max_count
+        x = self.data[self.front]
+        self.count -= 1
+        return x
+
+    def peek(self):
+        if self.is_empty():
+            raise IndexError('Queue is empty!')
+
+        return self.data[(self.front + 1) % self.max_count]
+```
+
+## 우선순위 큐 (Priority Queue)
+
+- 큐가 선입선출 (FIFO - First In, First-Out) 방식을 따르지 않고, 원소들의 우선순위에 따라 큐에서 빠져나오는 방식
+- e.g., 운영체제의 CPU 활용
+
+### 우선순위 큐의 구현
+
+1. Enqueue 할 때 우선순위 순서를 유지하도록
+2. Dequeue 할 때 우선순위 높은 것을 선택
+
+- 어느 것이 유리할까? - 둘 다 O(n)의 복잡도를 가지지만 1번이 더 유리함
+  - 1번은 이미 우선순위 순으로 정렬돼 있기 때문에 항상 모든 원소를 다 뒤져볼 필요는 없음
+  - 2번의 경우 항상 모든 원소를 다 뒤져서 우선순위를 비교해야 함
+
+1. 선형 배열 이용
+2. 연결 리스트 이용
+
+- 어느 것이 유리할까?
+  - **시간 복잡도 관점 - 리스트의 중간에 원소를 삽입해야 할 경우가 많은 우선순위 큐 특성상 연결 리스트가 유리**
+  - 공간 복잡도 관점 - 선형 배열이 유리
+
+```python
+# 값이 작을수록 우선순위가 높은 큐
+class PriorityQueue:
+    def __init__(self):
+        self.data = DoublyLinkedList()
+
+    def size(self):
+        return self.data.get_length()
+
+    def is_empty(self):
+        return self.size() == 0
+
+    def enqueue(self, item):
+        node = Node(item)
+        cur = self.data.head
+        while cur.next.next and item >= cur.next.data:
+            cur = cur.next
+        self.data.insert_after(cur, node)
+
+    def dequeue(self):
+        return self.data.pop_at(1)
+
+    def peek(self):
+        return self.data.get_at(1).data
 ```

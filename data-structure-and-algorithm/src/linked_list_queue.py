@@ -1,7 +1,7 @@
 from doubly_linked_list import Node, DoublyLinkedList
 
 
-class LinkedListStack:
+class LinkedListQueue:
     def __init__(self):
         self.data = DoublyLinkedList()
 
@@ -11,12 +11,12 @@ class LinkedListStack:
     def is_empty(self):
         return self.size() == 0
 
-    def push(self, item):
+    def enqueue(self, item):
         node = Node(item)
         self.data.insert_at(self.size() + 1, node)
 
-    def pop(self):
-        return self.data.pop_at(self.size())
+    def dequeue(self):
+        return self.data.pop_at(1)
 
     def peek(self):
-        return self.data.get_at(self.size()).data
+        return self.data.get_at(1).data
