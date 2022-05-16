@@ -1252,3 +1252,379 @@ class BinaryTree:
 
         return traversal
 ```
+
+## 이진 탐색 트리 (Binary Search Tree)
+
+- 모든 노드에 대해서
+  - 왼쪽 서브트리에 있는 데이터는 모두 현재 노드의 값보다 작고
+  - 오른쪽 서브트리에 있는 데이터는 모두 현재 노드의 값보다 큰
+- 성질을 만족하는 이진 트리
+- (중복되는 데이터 원소는 없는 것으로 가정)
+
+<img src="images/binary-search-tree.png" alt="이진 탐색 트리" width="400">
+
+### (정렬된) 배열을 이용한 이진 탐색과 비교
+
+- 장점
+  - 데이터 원소의 추가, 삭제가 용이
+- 단점
+  - 공간 소요가 큼
+    항상 O(logn)의 탐색 복잡도는 아닐 수 있음
+
+### 데이터 표현 - 각 노드는 (key, value)의 쌍으로
+
+- 키를 이용해서 검색 가능
+- 보다 복잡한 데이터 레코드로 확장 가능
+
+### 연산 정의
+
+- `insert(key, data)` - 데이터 원소 추가
+  - 입력 인자: 키, 데이터 원소
+  - 리턴: 없음
+- `remove(key)` - 특정 원소 삭제 (_아래서 추가 설명_)
+- `lookup(key)` - 특정 원소 검색
+  - 입력 인자: 찾으려는 대상 키
+  - 리턴: 찾은 노드와 그것의 **부모 노드** (각각 없으면 None으로)
+- `inorder()` - 키의 순서대로 데이터 원소를 나열
+- `min()`, `max()` - 최소 키, 최대 키를 가지는 원소를 각각 탐색
+
+#### 이진 탐색 트리에서 원소 삭제
+
+1. 키(Key)를 이용해서 노드를 찾는다.
+   - 해당 키의 노드가 없으면, 삭제할 것도 없음
+   - 찾은 노드의 부모 노드도 알고 있어야 함(아래 2번 때문)
+2. 찾은 노드를 제거하고도 이진 탐색 트리 성질을 만족하도록 트리의 구조를 정리한다.
+
+- `remove(key)` - 특정 원소를 트리로부터 삭제
+  - 입력: 키 (key)
+  - 출력: 삭제한 경우 True, 해당 키의 노드가 없는 경우 False
+
+#### 이진 탐색 트리 구조의 유지
+
+- 삭제되는 노드가
+  - 리프 노드인 경우
+    - 그냥 그 노드를 없애면 됨
+    - 부모 노드의 링크를 조정 (좌? 우?)
+  - 자식을 하나 가지고 있는 경우
+    - 삭제되는 노드 자리에 그 자식을 대신 배치
+      - 자식이 왼쪽? 오른쪽?
+      - 부모 노드의 링크를 조정 (좌? 우?)
+  - 자식을 둘 가지고 있는 경우
+    - 삭제되는 노드보다 바로 다음 (큰 or 작은) 키를 가지는 노드를 찾아 그 노드를 삭제되는 노드 자리에 대신 배치하고 이 노드를 대신 삭제
+
+```python
+class Node:
+    def __init__(self, key, data):
+        self.key = key
+        self.data = data
+        self.left = None
+        self.right = None
+
+    def inorder(self):
+        traversal = []
+        if self.left:
+            traversal += self.left.inorder()
+        traversal.append(self)
+        if self.right:
+            traversal += self.right.inorder()
+        return traversal
+
+    def min(self):
+        return self.left.min() if self.left else self
+
+    def max(self):
+        return self.right.max() if self.right else self
+
+    def lookup(self, key, parent=None):
+        if key < self.key:
+            return self.left.lookup(key, self) if self.left else None, None
+
+        if key > self.key:
+            return self.right.lookup(key, self) if self.right else None, None
+
+        return self, parent
+
+    def insert(self, key, data):
+        if key < self.key:
+            if self.left:
+                self.left.insert(key, data)
+            else:
+                self.left = Node(key, data)
+        elif key > self.key:
+            if self.right:
+                self.right.insert(key, data)
+            else:
+                self.right = Node(key, data)
+        else:
+            raise KeyError('중복된 키는 허용하지 않습니다.')
+
+    def count_children(self):
+        count = 0
+        if self.left:
+            count += 1
+        if self.right:
+            count += 1
+        return count
+
+
+class BinarySearchTree:
+    def __init__(self):
+        self.root = None
+
+    def inorder(self):
+        return self.root.inorder() if self.root else []
+
+    def min(self):
+        return self.root.min() if self.root else None
+
+    def max(self):
+        return self.root.max() if self.root else None
+
+    def lookup(self, key):
+        return self.root.lookup(key) if self.root else None, None
+
+    def insert(self, key, data):
+        if self.root:
+            self.root.insert(key, data)
+        else:
+            self.root = Node(key, data)
+
+    def remove(self, key):
+        node, parent = self.lookup(key)
+
+        if node:
+            children_count = node.count_children()
+
+            # The simplest case of no children
+            if children_count == 0:
+                # 만약 parent 가 있으면
+                # node 가 왼쪽 자식인지 오른쪽 자식인지 판단하여
+                # parent.left 또는 parent.right 를 None 으로 하여
+                # leaf node 였던 자식을 트리에서 끊어내어 없앱니다.
+                if parent:
+                    if parent.left is node:
+                        parent.left = None
+                    else:
+                        parent.right = None
+
+                # 만약 parent 가 없으면 (node 는 root 인 경우)
+                # self.root 를 None 으로 하여 빈 트리로 만듭니다.
+                else:
+                    self.root = None
+
+            # When the node has only one child
+            elif children_count == 1:
+                # 하나 있는 자식이 왼쪽인지 오른쪽인지를 판단하여
+                # 그 자식을 어떤 변수가 가리키도록 합니다.
+                if node.left:
+                    child = node.left
+                else:
+                    child = node.right
+
+                # 만약 parent 가 있으면
+                # node 가 왼쪽 자식인지 오른쪽 자식인지 판단하여
+                # 위에서 가리킨 자식을 대신 node 의 자리에 넣습니다.
+                if parent:
+                    if parent.left is node:
+                        parent.left = child
+                    else:
+                        parent.right = child
+                # 만약 parent 가 없으면 (node 는 root 인 경우)
+                # self.root 에 위에서 가리킨 자식을 대신 넣습니다.
+                else:
+                    self.root = child
+
+            # When the node has both left and right children
+            else:
+                parent = node
+                successor = node.right
+                # parent 는 node 를 가리키고 있고,
+                # successor 는 node 의 오른쪽 자식을 가리키고 있으므로
+                # successor 로부터 왼쪽 자식의 링크를 반복하여 따라감으로써
+                # 순환문이 종료할 때 successor 는 바로 다음 키를 가진 노드를,
+                # 그리고 parent 는 그 노드의 부모 노드를 가리키도록 찾아냅니다.
+                while successor.left:
+                    parent = successor
+                    successor = successor.left
+
+                # 삭제하려는 노드인 node 에 successor 의 key 와 data 를 대입합니다.
+                node.key = successor.key
+                node.data = successor.data
+                # 이제, successor 가 parent 의 왼쪽 자식인지 오른쪽 자식인지를 판단하여
+                # 그에 따라 parent.left 또는 parent.right 를
+                # successor 가 가지고 있던 (없을 수도 있지만) 자식을 가리키도록 합니다.
+                if parent.left is successor:
+                    parent.left = successor.right
+                else:
+                    parent.right = successor.right
+
+            return True
+
+        else:
+            return False
+```
+
+### 이진 탐색 트리가 효율적이지 못한 경우
+
+- 한 쪽으로 치우친 이진 탐색 트리의 경우
+  - 선형 탐색과 비슷함
+
+<img src="images/inefficient-binary-search-tree.png" alt="비효율적인 이진 탐색 트리" width="400">
+
+### 보다 나은 성능을 보이는 이진 탐색 트리들
+
+- 높이의 균형을 유지함으로써 O(logn)의 탐색 복잡도 보장
+- 삽입, 삭제 연산이 보다 복잡
+- e.g., AVL tree, Red-Black Tree
+
+# 힙 (Heap)
+
+- 이진 트리의 한 종류
+- 루트(Root) 노드가 언제나 최댓값 또는 최솟값을 가짐
+  - 최대 힙(Max Heap), 최소 힙(Min Heap)
+- 완전 이진 트리여야 함
+
+## 이진 탐색 트리와의 비교
+
+1. 원소들은 완전히 크기 순으로 정렬되어 있는가?
+   - 이진 탐색 트리는 그렇지만 힙은 아님
+2. 특정 키 값을 가지는 원소를 빠르게 검색할 수 있는가?
+   - 이진 탐색 트리에서는 가능하지만 힙은 아님
+3. 부가의 제약 조건은 어떤 것인가?
+   - 힙은 완전 이진 트리여야 함
+
+## 최대 힙(Max Heap)
+
+- 재귀적으로 정의할 수 있음
+  - 어느 노드를 루트로 하는 서브트리도 모두 최대 힙
+
+<img src="images/max-heap.png" alt="최대 힙" width="400">
+
+### 연산의 정의
+
+- `__init__()` - 빈 최대 힙을 생성
+- `insert(item)` - 새로운 원소 삽입
+- `remove()` - 최대 원소(Root Node)를 반환 및 삭제
+
+### 데이터 표현의 설계
+
+#### 배열을 이용한 이진 트리의 표현
+
+- 노드 번호 m을 기준으로
+  - 왼쪽 자식의 번호: 2 \* m
+  - 오른쪽 자식의 번호: 2 \* m + 1
+  - 부모 노드의 번호: m // 2
+- 완전 이진 트리이므로
+  - 노드의 추가/삭제는 마지막 노드에서만
+
+|  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  | 10  |
+| :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+|  -  | 30  | 24  | 12  | 18  | 21  |  8  |  6  |  4  |  2  | 19  |
+
+#### 최대 힙에 원소 삽입
+
+1. 트리의 마지막 자리에 새로운 원소를 임시로 저장
+2. 부모 노드와 키 값을 비교하여 위로, 위로, 이동
+
+- 원소의 개수가 n인 최대 힙에 새로운 원소 삽입
+  - 부모 노드와의 대소 비교 최대 회수: log<sub>2</sub>n
+- 최악 복잡도 O(logn) 삽입 연산
+
+#### 최대 힙에서 원소 삭제
+
+1. 루트 노드의 제거 - 이것이 원소들 중 최댓값
+2. 트리 마지막 자리 노드를 임시로 루트 노드의 자리에 배치
+3. 자식 노드들과의 값 비교와 아래로, 아래로 이동
+   - 자식은 둘 있을 수 있는데, 어느 쪽으로 이동
+
+- 원소의 개수가 n인 최대 힙에서 최대 원소 삭제
+  - 자식 노드들과의 대소 비교 최대 회수: 2 x log<sub>2</sub>n
+- 최악 복잡도 O(logn)의 삭제 연산
+
+```python
+class MaxHeap:
+    def __init__(self):
+        self.data = [None]
+
+    def insert(self, item):
+        self.data.append(item)
+
+        cur = len(self.data) - 1
+        parent = cur // 2
+
+        while parent and self.data[cur] > self.data[parent]:
+            self.data[cur], self.data[parent] = self.data[parent], self.data[cur]
+            cur = parent
+            parent //= 2
+
+    def remove(self):
+        if len(self.data) <= 1:
+            return None
+
+        self.data[1], self.data[-1] = self.data[-1], self.data[1]
+        data = self.data.pop(-1)
+        self.max_heapify(1)
+
+        return data
+
+    def max_heapify(self, i):
+        # 왼쪽 자식 (left child) 의 인덱스를 계산합니다.
+        left = i * 2
+
+        # 오른쪽 자식 (right child) 의 인덱스를 계산합니다.
+        right = i * 2 + 1
+
+        biggest = i
+
+        # 왼쪽 자식이 존재하는지, 그리고 왼쪽 자식의 (키) 값이 (무엇보다?) 더 큰지를 판단합니다.
+        if left < len(self.data) and self.data[left] > self.data[biggest]:
+            biggest = left
+
+        # 오른쪽 자식이 존재하는지, 그리고 오른쪽 자식의 (키) 값이 (무엇보다?) 더 큰지를 판단합니다.
+        if right < len(self.data) and self.data[right] > self.data[biggest]:
+            biggest = right
+
+        if biggest != i:
+            # 현재 노드 (인덱스 i) 와 최댓값 노드 (왼쪽 아니면 오른쪽 자식) 를 교체합니다.
+            self.data[biggest], self.data[i] = self.data[i], self.data[biggest]
+
+            # 재귀적 호출을 이용하여 최대 힙의 성질을 만족할 때까지 트리를 정리합니다.
+            self.max_heapify(biggest)
+```
+
+### 최대/최소 힙의 응용
+
+#### 우선순위 큐 (Priority Queue)
+
+- Enqueue 할 때 "느슨한 정렬"을 이루고 있도록 함: O(logn)
+- Dequeue 할 때 최댓값을 순서대로 추출: O(logn)
+- 연결 리스트로 구현한 우선순위 큐와 비교
+
+|      | 연결 리스트 |   힙    |
+| :--: | :---------: | :-----: |
+| 삽입 |    O(n)     | O(logn) |
+| 삭제 |    O(1)     | O(logn) |
+
+#### 힙 정렬(Heap Sort)
+
+- 정렬되지 않은 원소들을 아무 순서로나 최대 힙에 삽입: O(logn)
+- 삽입이 끝나면, 힙이 비게 될때까지 하나씩 삭제: O(logn)
+- 원소들이 삭제된 순서가 원소들의 정렬 순서
+- 정렬 알고리즘의 복잡도: O(nlogn)
+
+> 최대 힙 관련 코드는 [max_heap.py](src/max_heap.py) 참고
+
+```python
+def heap_sort(unsorted):
+    H = MaxHeap()
+    for item in unsorted:
+        H.insert(item)
+
+    sorted = []
+    d = H.remove()
+    while d:
+        sorted.append(d)
+        d = H.remove()
+
+    return sorted
+```
