@@ -1042,3 +1042,213 @@ class PriorityQueue:
     def peek(self):
         return self.data.get_at(1).data
 ```
+
+# 트리 (Tree)
+
+- 정점(Node)과 간선(Edge)을 이용해서 데이터의 배치 형태를 추상화한 자료 구조
+
+![트리](images/tree.png)
+
+##### 출처: [https://cbarkinozer.medium.com/tree-data-structures-7075dffb5ab9](https://cbarkinozer.medium.com/tree-data-structures-7075dffb5ab9)
+
+## 트리 용어
+
+- 제일 위가 루트 (Root) 노드
+- 제일 아래가 리프 (Leaf) 노드
+- 루트도 리프도 아닌 내부 (Internal) 노드
+- 바로 위는 부모 (Parent) 노드
+- 바로 아래는 자식 (Child) 노드
+- 같은 부모를 두면 형제 (Sibling) 노드
+- 부모와 그 부모 노드들은 조상 (Ancestor) 노드
+- 자식과 그 자식 노드들은 후손 (Descendant) 노드
+
+### 수준 (Level)
+
+- 루트 노드의 Level은 0 또는 1부터 시작할 수 있는데 여기서는 0부터 시작함
+- 루트 노드의 Level이 0, 아래로 내려갈 수록 Level이 1씩 높아짐
+  - Level이 루트 노드로부터 특정 노드까지의 간선의 수라고 정의하면 루트 노드를 0으로 하는 게 편함
+
+### 높이 (Height)
+
+- 깊이(Depth)라고도 함
+- 트리의 높이 (Height) = 최대 수준 (Level) + 1
+
+### 부분 트리 (Subtree)
+
+- 전체 트리에서 부분을 차지하는 트리
+
+### 노드의 차수 (Degree)
+
+- 자식(서브트리)의 수
+- 리프 노드는 자식이 없어서 차수가 0
+
+### 이진 트리 (Binary Tree)
+
+- 모든 노드의 차수가 2 이하인 트리
+- 재귀적으로 정의할 수 있음
+  - **빈 트리(Empty Tree)이거나**
+  - 루트 노드 + 왼쪽 서브트리 + 오른쪽 서브트리
+  - 이때 왼쪽과 오른쪽 서브트리 또한 이진 트리
+
+![이진 트리](images/binary-tree.png)
+
+### 포화 이진 트리 (Full Binary Tree)
+
+- 모든 레벨에서 노드들이 모두 채워져 있는 이진 트리
+- 높이가 k라면, 노드의 개수가 2<sup>k</sup>-1인 이진 트리
+
+![포화 이진 트리](images/full-binary-tree.png)
+
+### 완전 이진 트리 (Complete Binary Tree)
+
+- 높이 k인 완전 이진 트리
+- 레벨 k-2까지는 모든 노드가 2개의 자식을 가진 포화 이진 트리
+- 레벨 k-1에서는 왼쪽부터 노드가 순차적으로 채워져 있는 이진 트리
+
+![완전 이진 트리](images/complete-binary-tree.png)
+
+## 이진 트리 구현
+
+### 연산의 정의
+
+- `size()` - 현재 트리에 포함되어 있는 노드의 수
+  - 전체 이진 트리의 size() = 왼쪽 서브트리의 size() + 오른쪽 서브트리의 size() + 1 (자기 자신)
+- `depth()` - 현재 트리의 깊이 (또는 높이; height)
+  - 전체 이진 트리의 depth() = 왼쪽 서브트리의 depth()와 오른쪽 서브트리의 depth() 중 더 큰 것 + 1
+- 순회 (Traversal)
+  - 깊이 우선 순회 (Depth First Traversal)
+    - 중위 순회 (In-order Traversal)
+    - 전위 순회 (Pre-order Traversal)
+    - 후위 순회 (Post-order Traversal)
+  - 넓이 우선 순회 (Breadth First Traversal)
+
+#### 중위 순회 (In-order Traversal)
+
+1. 왼쪽 서브트리
+2. 자기 자신
+3. 오른쪽 서브트리
+
+<img src="images/inorder-traversal.png" alt="중위 순회" width="400">
+
+#### 전위 순회 (Pre-order Traversal)
+
+1. 자기 자신
+2. 왼쪽 서브트리
+3. 오른쪽 서브트리
+
+<img src="images/preorder-traversal.png" alt="전위 순회" width="400">
+
+#### 후위 순회 (Post-order Traversal)
+
+1. 왼쪽 서브트리
+2. 오른쪽 서브트리
+3. 자기 자신
+
+<img src="images/postorder-traversal.png" alt="후위 순회" width="400">
+
+#### 넓이 우선 순회 (Breadth First Traversal)
+
+- 원칙
+  - 수준(Level)이 낮은 노드를 우선으로 방문
+  - 같은 수준의 노드들 사이에는,
+    - 부모 노드의 방문 순서에 따라 방문
+    - 왼쪽 자식을 오른쪽 자식보다 먼저 방문
+- 재귀적 방법이 적합하지 않음
+
+<img src="images/breadth-first-traversal.png" alt="넓이 우선 순회" width="400">
+
+#### 넓이 우선 순회 알고리즘 설계
+
+- 한 노드를 방문했을 때, 나중에 방문할 노드들을 순서대로 기록해 두어야 함
+  - 큐가 유리
+
+1. (초기화) traversal <- 빈 리스트, q <- 빈 큐
+2. 빈 트리가 아니면, root node를 q에 추가 (enqueue)
+3. q가 비어 있지 않은 동안
+   1. node <- q에서 원소를 추출 (dequeue)
+   2. node를 방문
+   3. node의 왼쪽, 오른쪽 자식 (있으면) 들을 q에 추가
+4. q가 빈 큐가 되면 모든 노드 방문 완료
+
+> 큐 관련 코드는 [array_queue.py](src/array_queue.py) 참고
+
+```python
+class Node:
+    def __init__(self, item):
+        self.data = item
+        self.left = None
+        self.right = None
+
+    def size(self):
+        l = self.left.size() if self.left else 0
+        r = self.right.size() if self.right else 0
+        return l + r + 1
+
+    def depth(self):
+        l = self.left.depth() if self.left else 0
+        r = self.right.depth() if self.right else 0
+        return max(l, r) + 1
+
+    def inorder(self):
+        traversal = []
+        if self.left:
+            traversal += self.left.inorder()
+        traversal.append(self.data)
+        if self.right:
+            traversal += self.right.inorder()
+        return traversal
+
+    def preorder(self):
+        traversal = [self.data]
+        if self.left:
+            traversal += self.left.preorder()
+        if self.right:
+            traversal += self.right.preorder()
+        return traversal
+
+    def postorder(self):
+        traversal = []
+        if self.left:
+            traversal += self.left.postorder()
+        if self.right:
+            traversal += self.right.postorder()
+        traversal.append(self.data)
+        return traversal
+
+
+class BinaryTree:
+    def __init__(self, r):
+        self.root = r
+
+    def size(self):
+        return self.root.size() if self.root else 0
+
+    def depth(self):
+        return self.root.depth() if self.root else 0
+
+    def inorder(self):
+        return self.root.inorder() if self.root else []
+
+    def preorder(self):
+        return self.root.preorder() if self.root else []
+
+    def postorder(self):
+        return self.root.postorder() if self.root else []
+
+    def bft(self):
+        traversal = []
+        q = ArrayQueue()
+
+        if self.root:
+            q.enqueue(self.root)
+
+        while not q.is_empty():
+            node = q.dequeue()
+            traversal.append(node.data)
+            if node.left:
+                q.enqueue(node.left)
+            if node.right:
+                q.enqueue(node.right)
+
+        return traversal
+```
