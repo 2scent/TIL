@@ -214,7 +214,7 @@ def recursive_binary_search(L, x, lower, upper):
 
 ## 단일 연결 리스트 (Singly Linked List)
 
-![단일 연결 리스트](images/singly-linked-list.png)
+![단일 연결 리스트](images/programmers-data-structure-and-algorithm-with-python/singly-linked-list.png)
 
 ### Node
 
@@ -433,7 +433,7 @@ class SinglyLinkedList:
 - 한쪽이 아닌 양쪽으로 링크 연결
 - **정방향, 역방향 둘다 진행 가능**
 
-![양방향 연결 리스트](images/doubly-linked-list.png)
+![양방향 연결 리스트](images/programmers-data-structure-and-algorithm-with-python/doubly-linked-list.png)
 
 ### Node
 
@@ -572,7 +572,7 @@ class DoublyLinkedList:
 - 꺼낼 때는 같은 쪽에서 뽑아 꺼내야 한다 - Pop 연산
 - 후입선출 (LIFO - Last In, First Out)
 
-![스택](images/stack.png)
+![스택](images/programmers-data-structure-and-algorithm-with-python/stack.png)
 
 ## 스택에서 발생할 수 있는 오류
 
@@ -614,7 +614,7 @@ class ArrayStack:
 
 ### 연결 리스트를 이용한 구현
 
-> 연결 리스트 관련 코드는 [doubly_linked_list.py](src/doubly_linked_list.py) 참고
+> 연결 리스트 관련 코드는 [doubly_linked_list.py](src/programmers-data-structure-and-algorithm-with-python/doubly_linked_list.py) 참고
 
 ```python
 class LinkedListStack:
@@ -672,7 +672,7 @@ class LinkedListStack:
    5. 현재 연산자는 스택에 Push
 3. 스택에 남아 있는 연산자는 모두 Pop
 
-> 스택 관련 코드는 [array_stack.py](src/array_stack.py) 참고
+> 스택 관련 코드는 [array_stack.py](src/programmers-data-structure-and-algorithm-with-python/array_stack.py) 참고
 
 ```python
 # 1
@@ -730,7 +730,7 @@ def infix_to_postfix(expr):
       - (2) 연산 (1)을 계산하고, 이 결과를 스택에 Push
 2. 수식의 끝에 도달하면 스택에서 Pop -> 이것이 계산 결과
 
-> 스택 관련 코드는 [array_stack.py](src/array_stack.py) 참고
+> 스택 관련 코드는 [array_stack.py](src/programmers-data-structure-and-algorithm-with-python/array_stack.py) 참고
 
 ```python
 def split_tokens(expr):
@@ -843,7 +843,7 @@ def calculate_postfix(expr):
 - 선입선출 (FIFO - First In, First Out)
 - e.g., 경기장 입장을 기다리는 대기열
 
-![큐](images/queue.png)
+![큐](images/programmers-data-structure-and-algorithm-with-python/queue.png)
 
 ## 큐의 구현
 
@@ -892,7 +892,7 @@ class ArrayQueue:
 
 ### 연결 리스트를 이용한 구현
 
-> 연결 리스트 관련 코드는 [doubly_linked_list.py](src/doubly_linked_list.py) 참고
+> 연결 리스트 관련 코드는 [doubly_linked_list.py](src/programmers-data-structure-and-algorithm-with-python/doubly_linked_list.py) 참고
 
 ```python
 class LinkedListQueue:
@@ -941,7 +941,7 @@ class LinkedListQueue:
 
 - **정해진 개수**의 저장 공간을 빙 돌려가며 이용
 
-![환형 큐](images/circular-queue.gif)
+![환형 큐](images/programmers-data-structure-and-algorithm-with-python/circular-queue.gif)
 
 ### 연산의 정의
 
@@ -1047,7 +1047,7 @@ class PriorityQueue:
 
 - 정점(Node)과 간선(Edge)을 이용해서 데이터의 배치 형태를 추상화한 자료 구조
 
-![트리](images/tree.png)
+![트리](images/programmers-data-structure-and-algorithm-with-python/tree.png)
 
 ##### 출처: [https://cbarkinozer.medium.com/tree-data-structures-7075dffb5ab9](https://cbarkinozer.medium.com/tree-data-structures-7075dffb5ab9)
 
@@ -1090,14 +1090,14 @@ class PriorityQueue:
   - 루트 노드 + 왼쪽 서브트리 + 오른쪽 서브트리
   - 이때 왼쪽과 오른쪽 서브트리 또한 이진 트리
 
-![이진 트리](images/binary-tree.png)
+![이진 트리](images/programmers-data-structure-and-algorithm-with-python/binary-tree.png)
 
 ### 포화 이진 트리 (Full Binary Tree)
 
 - 모든 레벨에서 노드들이 모두 채워져 있는 이진 트리
 - 높이가 k라면, 노드의 개수가 2<sup>k</sup>-1인 이진 트리
 
-![포화 이진 트리](images/full-binary-tree.png)
+![포화 이진 트리](images/programmers-data-structure-and-algorithm-with-python/full-binary-tree.png)
 
 ### 완전 이진 트리 (Complete Binary Tree)
 
@@ -1105,7 +1105,7 @@ class PriorityQueue:
 - 레벨 k-2까지는 모든 노드가 2개의 자식을 가진 포화 이진 트리
 - 레벨 k-1에서는 왼쪽부터 노드가 순차적으로 채워져 있는 이진 트리
 
-![완전 이진 트리](images/complete-binary-tree.png)
+![완전 이진 트리](images/programmers-data-structure-and-algorithm-with-python/complete-binary-tree.png)
 
 ## 이진 트리 구현
 
@@ -1128,7 +1128,7 @@ class PriorityQueue:
 2. 자기 자신
 3. 오른쪽 서브트리
 
-<img src="images/inorder-traversal.png" alt="중위 순회" width="400">
+<img src="images/programmers-data-structure-and-algorithm-with-python/inorder-traversal.png" alt="중위 순회" width="400">
 
 #### 전위 순회 (Pre-order Traversal)
 
@@ -1136,7 +1136,7 @@ class PriorityQueue:
 2. 왼쪽 서브트리
 3. 오른쪽 서브트리
 
-<img src="images/preorder-traversal.png" alt="전위 순회" width="400">
+<img src="images/programmers-data-structure-and-algorithm-with-python/preorder-traversal.png" alt="전위 순회" width="400">
 
 #### 후위 순회 (Post-order Traversal)
 
@@ -1144,7 +1144,7 @@ class PriorityQueue:
 2. 오른쪽 서브트리
 3. 자기 자신
 
-<img src="images/postorder-traversal.png" alt="후위 순회" width="400">
+<img src="images/programmers-data-structure-and-algorithm-with-python/postorder-traversal.png" alt="후위 순회" width="400">
 
 #### 넓이 우선 순회 (Breadth First Traversal)
 
@@ -1155,7 +1155,7 @@ class PriorityQueue:
     - 왼쪽 자식을 오른쪽 자식보다 먼저 방문
 - 재귀적 방법이 적합하지 않음
 
-<img src="images/breadth-first-traversal.png" alt="넓이 우선 순회" width="400">
+<img src="images/programmers-data-structure-and-algorithm-with-python/breadth-first-traversal.png" alt="넓이 우선 순회" width="400">
 
 #### 넓이 우선 순회 알고리즘 설계
 
@@ -1170,7 +1170,7 @@ class PriorityQueue:
    3. node의 왼쪽, 오른쪽 자식 (있으면) 들을 q에 추가
 4. q가 빈 큐가 되면 모든 노드 방문 완료
 
-> 큐 관련 코드는 [array_queue.py](src/array_queue.py) 참고
+> 큐 관련 코드는 [array_queue.py](src/programmers-data-structure-and-algorithm-with-python/array_queue.py) 참고
 
 ```python
 class Node:
@@ -1261,7 +1261,7 @@ class BinaryTree:
 - 성질을 만족하는 이진 트리
 - (중복되는 데이터 원소는 없는 것으로 가정)
 
-<img src="images/binary-search-tree.png" alt="이진 탐색 트리" width="400">
+<img src="images/programmers-data-structure-and-algorithm-with-python/binary-search-tree.png" alt="이진 탐색 트리" width="400">
 
 ### (정렬된) 배열을 이용한 이진 탐색과 비교
 
@@ -1469,7 +1469,7 @@ class BinarySearchTree:
 - 한 쪽으로 치우친 이진 탐색 트리의 경우
   - 선형 탐색과 비슷함
 
-<img src="images/inefficient-binary-search-tree.png" alt="비효율적인 이진 탐색 트리" width="400">
+<img src="images/programmers-data-structure-and-algorithm-with-python/inefficient-binary-search-tree.png" alt="비효율적인 이진 탐색 트리" width="400">
 
 ### 보다 나은 성능을 보이는 이진 탐색 트리들
 
@@ -1498,7 +1498,7 @@ class BinarySearchTree:
 - 재귀적으로 정의할 수 있음
   - 어느 노드를 루트로 하는 서브트리도 모두 최대 힙
 
-<img src="images/max-heap.png" alt="최대 힙" width="400">
+<img src="images/programmers-data-structure-and-algorithm-with-python/max-heap.png" alt="최대 힙" width="400">
 
 ### 연산의 정의
 
@@ -1612,7 +1612,7 @@ class MaxHeap:
 - 원소들이 삭제된 순서가 원소들의 정렬 순서
 - 정렬 알고리즘의 복잡도: O(nlogn)
 
-> 최대 힙 관련 코드는 [max_heap.py](src/max_heap.py) 참고
+> 최대 힙 관련 코드는 [max_heap.py](src/programmers-data-structure-and-algorithm-with-python/max_heap.py) 참고
 
 ```python
 def heap_sort(unsorted):

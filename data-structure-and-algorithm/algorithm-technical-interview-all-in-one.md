@@ -269,7 +269,7 @@ class LinkedList:
 - O(1) < O( 𝑙𝑜𝑔𝑛 ) < O(n) < O(n 𝑙𝑜𝑔𝑛 ) < O( 𝑛2 ) < O( 2𝑛 ) < O(n!)
 - 입력 n에 따라 시간 복잡도가 기하급수적으로 늘어날 수 있음
 
-![Big O Notation](images/big-o-notation.jpg)
+![Big O Notation](images/algorithm-technical-interview-all-in-one/big-o-notation.jpg)
 
 ## 예시 - 1부터 n까지의 합을 구하는 두 알고리즘 비교
 
