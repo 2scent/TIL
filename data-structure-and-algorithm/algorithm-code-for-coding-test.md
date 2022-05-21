@@ -6,7 +6,7 @@
 
 # 제1장 - 코딩 테스트 준비, 6개월이면 충분하다
 
-- <백준> 플래티넘 5 or <코드포스> 파란색 랭크를 달성하면 대부분 기업의 코딩 테스트를 통과할 수 있다.
+> <백준> 플래티넘 5 or <코드포스> 파란색 랭크를 달성하면 대부분 기업의 코딩 테스트를 통과할 수 있다.
 
 ## <백준> 난이도 등급
 
@@ -28,7 +28,7 @@
 
 # 제2장 - 코딩 테스트의 주적, 시간 복잡도
 
-- 코딩 테스트에서는 보통 컴퓨터가 1초당 1억 번 연산할 수 있다고 가정한다.
+> 코딩 테스트에서는 보통 컴퓨터가 1초당 1억 번 연산할 수 있다고 가정한다.
 
 ## 시간 복잡도의 빅오 표현법
 
@@ -205,30 +205,22 @@ else:
 
 > <백준> [별 찍기 - 1](https://www.acmicpc.net/problem/2438)
 
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/5%EC%9E%A5/5-3-1.py)
+
 ```python
-# 파이써닉한 방법
 n = int(input())
 
 for i in range(1, n + 1):
     print('*' * i)
-```
-
-```python
-# C언어 계열 방법
-n = int(input())
-
-for i in range(n):
-    for j in range(i + 1):
-        print('*', end='')
-    print()
 ```
 
 ### for문 예제 2
 
 > <백준> [별 찍기 - 2](https://www.acmicpc.net/problem/2439)
 
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/5%EC%9E%A5/5-3-2.py)
+
 ```python
-# 파이써닉한 방법
 n = int(input())
 
 for i in range(1, n + 1):
@@ -236,41 +228,18 @@ for i in range(1, n + 1):
     print('*' * i)
 ```
 
-```python
-# C언어 계열 방법
-n = int(input())
-
-for i in range(n):
-    for j in range(n - i - 1):
-        print(' ', end='')
-    for j in range(i + 1):
-        print('*', end='')
-    print()
-```
-
 ### for문 예제 3
 
 > <백준> [별 찍기 - 5](https://www.acmicpc.net/problem/2442)
 
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/5%EC%9E%A5/5-3-3.py)
+
 ```python
-# 파이써닉한 방법
 n = int(input())
 
 for i in range(1, n + 1):
     print(' ' * (n - i), end='')
     print('*' * (2 * i - 1))
-```
-
-```python
-# C언어 계열 방법
-n = int(input())
-
-for i in range(n):
-    for j in range(n - i - 1):
-        print(' ', end='')
-    for j in range(2 * i + 1):
-        print('*', end='')
-    print()
 ```
 
 ## 함수
@@ -300,4 +269,218 @@ print(sub(a, b))
 print(mul(a, b))
 print(div(a, b))
 print(mod(a, b))
+```
+
+# 제6장 - ArrayList와 LinkedList
+
+> 평생 사용해야 할 자료구조
+
+## ArrayList
+
+- 간단히 생각하면 배열이라고 할 수 있다.
+- 배열과 달리 저장 공간이 가변적이라는 특징이 있다.
+
+### 접근
+
+- 2번째 위치에 접근하면 10이 있고, 4번째 위치에 접근하면 30이 있다.
+- ArrayList가 특정한 위치에 접근하기 위한 시간 복잡도는 O(1)이다.
+
+| index |  0  |  1  |  2  |  3  |  4  |  5  |
+| :---: | :-: | :-: | :-: | :-: | :-: | :-: |
+| value | 70  | 40  | 10  | 60  | 30  | 50  |
+
+### 삽입
+
+- 3번째 위치에 25를 삽입한다고 가정하면, 그 위치를 확보하기 위해 기존의 4, 5번째 원소들을 5, 6번째 자리로 이동해야 한다.
+- 배열의 크기가 n일 때, 최대 n번을 이동해야 할 수 있으므로 시간 복잡도는 O(n)이다.
+
+| index |  0  |  1  |  2  |  3  |  4  |  5  |  6  |
+| :---: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| value | 70  | 40  | 10  | 25  | 60  | 30  | 50  |
+
+### 삭제
+
+- 다시 2번째 위치의 원소를 삭제한다면, 그 뒤에 3, 4, 5, 6번째 원소들을 앞으로 한 칸씩 이동시켜야 한다.
+- 배열의 크기가 n일 때, 최대 n번을 이동해야 할 수 있으므로 시간 복잡도는 O(n)이다.
+
+| index |  0  |  1  |  2  |  3  |  4  |  5  |
+| :---: | :-: | :-: | :-: | :-: | :-: | :-: |
+| value | 70  | 40  | 25  | 60  | 30  | 50  |
+
+### ArrayList 연산들의 시간 복잡도
+
+|             | 탐색 | 삽입 | 삭제 |
+| :---------: | :--: | :--: | :--: |
+| 시간 복잡도 | O(1) | O(n) | O(n) |
+
+### 파이썬에서 ArrayList 사용법
+
+- 파이썬은 ArrayList만을 위한 자료구조가 따로 존재하지 않으며, 리스트로 대체해서 사용할 수 있다.
+
+```python
+# 방법 1
+arr = []
+
+# 방법 2
+arr = list()
+```
+
+### ArrayList를 사용하는 예제
+
+> <백준> [최소, 최대](https://www.acmicpc.net/problem/10818)
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/6%EC%9E%A5/6-1-1.py)
+- n개의 정수를 입력받기 위해 배열을 이용한다.
+
+```python
+input()  # 정수의 개수를 나타내는 첫 번째 입력은 사용하지 않는다.
+num_list = list(map(int, input().split()))
+
+max_num = num_list[0]
+min_num = num_list[0]
+
+for num in num_list:
+    max_num = max(max_num, num)
+    min_num = min(min_num, num)
+
+print(min_num, max_num)
+```
+
+### 2차원 배열 사용 예제
+
+> <백준> [나는 요리사다](https://www.acmicpc.net/problem/2953)
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/6%EC%9E%A5/6-1-2.py)
+
+```python
+# 2차원 배열을 입력과 동시에 모두 더해 점수로 변환한다.
+score_list = [sum(map(int, input().split())) for _ in range(5)]
+
+max_score = max(score_list)
+max_index = score_list.index(max_score)
+
+print(max_index + 1, max_score)
+```
+
+### 삽입과 삭제가 많은 ArrayList의 잘못된 사용 예
+
+> <백준> [크게 만들기](https://www.acmicpc.net/problem/2812)
+
+- 탐욕법 알고리즘과 스택 자료구조에 대한 이해가 있어야 풀 수 있는 문제다.
+- 가장 큰 수를 만들기 위해서는 지우는 횟수 k가 남아 있을 때, 현재 index가 가리키는 값은 바로 왼쪽의 값보다 작거나 같아야 한다.
+  - 입력받은 수 1924에서 현재 index가 9를 가리킬 때, 9는 그 왼쪽에 있는 1보다 작거나 같아야 한다.
+  - 그렇지 않으면 1을 삭제한다.
+
+```python
+# 저자의 오답 코드 - 정상적으로 동작하지 않아 일부 수정
+n, k = map(int, input().split())
+number = list(input())
+
+for i in range(1, len(number)):
+    while number[i] > number[i - 1] and k:
+        k -= 1
+        del number[i - 1]
+        number.insert(0, 'a')
+
+answer = ''
+for i in range(0, len(number) - k):
+    if number[i] != 'a':
+        answer += number[i]
+
+print(answer)
+```
+
+- 이 코드는 입출력은 문제없이 동작하지만 시간 복잡도를 충족하지 못하기 때문에 테스트에 실패한다.
+- 이 문제의 시간 제한은 1초, 즉 1억 번의 연산을 허용한다.
+- 숫자의 길이 n과 지우는 횟수 k의 최댓값은 500,000이다.
+- k번 수를 지우기 위한 시간 복잡도를 구해보면
+  - 수를 지우기 위한 주요 코드는 `del number[i - 1]`, `number.insert(0, 'a')`
+  - 각각 ArrayList의 삭제와 삽입 연산으로서 O(n)의 시간이 걸린다.
+  - 이를 k번 반복하면 O(k\*n\*n)의 즉 500,000\*500,000\*500,000이므로 1억을 넘는다.
+
+## LinkedList
+
+![링크드 리스트](images/algorithm-code-for-coding-test/linked-list.png)
+
+- **데이터**와 다음 노드를 가리키는 **next**를 가진 노드들을 이어붙인 자료구조다.
+- 특정 노드에 접근하기 위해서는 다음 노드로 순차적으로 이동해야 하기 때문에 O(n)의 시간 복잡도가 걸린다.
+- 삽입 또는 삭제 연산은 그 위치를 알고 있을 경우, 다음 노드를 가리키는 next의 값만 수정하기 때문에 O(1)의 시간 복잡도가 걸린다.
+- 알고리즘 문제 해결에서는 LinkedList를 보기 힘들기 때문에 사용을 권하진 않지만 면접에서는 단골 질문이므로 ArrayList와의 차이는 확실히 알아두자.
+
+### LinkedList 연산들의 시간 복잡도
+
+|             | 탐색 |             삽입             |             삭제             |
+| :---------: | :--: | :--------------------------: | :--------------------------: |
+| 시간 복잡도 | O(n) | O(1)<br />위치를 모르면 O(n) | O(1)<br />위치를 모르면 O(n) |
+
+### LinkedList를 이용한 예제
+
+> <백준> [요세푸스 문제](https://www.acmicpc.net/problem/1158)
+
+```python
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def insert(self, data):
+        node = Node(data)
+
+        if not self.head:
+            self.head = node
+            return
+
+        cur = self.head
+        while cur.next:
+            cur = cur.next
+        cur.next = node
+
+    def get(self, index):
+        node = self.head
+        count = 0
+
+        while count < index:
+            node = node.next
+            count += 1
+
+        return node
+
+    def delete(self, index):
+        if index == 0:
+            del_node = self.head
+            self.head = self.head.next
+            return del_node.data
+
+        prev = self.get(index - 1)
+        del_node = prev.next
+        prev.next = del_node.next
+        return del_node.data
+
+
+n, k = map(int, input().split())
+
+L = LinkedList()
+for i in range(1, n + 1):
+    L.insert(i)
+
+result = []
+
+# 구현한 리스트의 인덱스는 0부터 시작하기 때문에 k-1을 저장한다.
+idx = k - 1
+while L.head:
+    # 인덱스가 리스트의 범위를 초과하면 다시 처음부터 접근해야 하기 때문에 나머지 연산을 한다.
+    idx %= n
+    result.append(str(L.delete(idx)))
+    # 사람을 한 명 지웠으므로 k가 아닌 k-1을 더해 다음 인덱스를 가리킨다.
+    idx += (k - 1)
+    n -= 1
+
+print('<', end='')
+print(', '.join(result), end='')
+print('>')
 ```
