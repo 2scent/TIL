@@ -484,3 +484,116 @@ print('<', end='')
 print(', '.join(result), end='')
 print('>')
 ```
+
+# 제7장 - 스택 (Stack)
+
+![스택](images/algorithm-code-for-coding-test/stack.png)
+
+- 나중에 입력된 데이터가 가장 먼저 출력되는 자료 구조
+- 후입선출 LIFO(Last-In, First-Out)
+- 입출력 시, 각각 O(1)의 시간 복잡도
+  - n개의 데이터 입출력한다면 O(n)의 시간 복잡도
+- 코딩 테스트나 <코드포스> 대회, 면접에서도 자주 등장하므로 필수 자료구조
+- 코딩 테스트에서 문제를 주어진 시간 안에 해결하기 위해서는 O(n) 또는 O(nlogn)의 시간 복잡도로 풀어야 하는 상황에 자주 놓이는데 입출력 시간 복잡도가 O(n)이 스택이 유용할 수 있다.
+
+## 스택을 사용하는 예제 1
+
+> <백준> [스택](https://www.acmicpc.net/problem/10828)
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/7%EC%9E%A5/7-4.py)
+
+```python
+import sys
+
+n = int(sys.stdin.readline())
+
+stack = []
+
+for _ in range(n):
+    command = sys.stdin.readline().split()
+
+    if command[0] == 'push':
+        stack.append(command[1])
+        continue
+
+    if command[0] == 'pop':
+        print(stack.pop() if len(stack) != 0 else -1)
+        continue
+
+    if command[0] == 'size':
+        print(len(stack))
+        continue
+
+    if command[0] == 'empty':
+        print(1 if len(stack) != 0 else 0)
+        continue
+
+    if command[0] == 'top':
+        print(stack[-1] if len(stack) != 0 else -1)
+        continue
+```
+
+## 스택을 사용하는 예제 2
+
+> <백준> [쇠막대기](https://www.acmicpc.net/problem/10799)
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/7%EC%9E%A5/7-5.py)
+
+### 풀이
+
+- '('를 만날 때마다 스택에 Push한다.
+- ')'를 만나면 스택에서 Pop을 한 번 하고
+  - 바로 앞이 '('면 현재 스택의 크기만큼 총 개수에 더한다.
+  - 바로 앞이 ')'면 1을 총 개수에 더한다.
+
+```python
+parentheses = input()
+
+result = 0
+stack = []
+prev = ''
+
+for cur in parentheses:
+    if cur == '(':
+        stack.append(cur)
+    else:
+        stack.pop()
+        if prev == '(':
+            result += len(stack)
+        else:
+            result += 1
+
+    prev = cur
+
+print(result)
+```
+
+## 스택을 사용하는 예제 3
+
+> <백준> 크게 만들기
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/7%EC%9E%A5/7-6.py)
+- 6장의 ArrayList에서 **시간 초과**로 실패했던 문제다.
+
+### 풀이
+
+- 6장의 ArrayList에서 풀었을 때 틀린 이유는 `del number[i - 1]`, `number.insert(0, 'a')`처럼 O(n) 시간 복잡도가 걸리는 배열 중간에 삽입, 삭제 연산을 했기 때문이다.
+- O(1) 시간 복잡도가 걸리는 스택의 삽입, 삭제 연산을 사용하면 이 문제를 해결할 수 있다.
+
+```python
+n, k = map(int, input().split())
+number_list = list(input())
+
+stack = []
+delete_count = k
+
+for number in number_list:
+    while stack and delete_count > 0 and number > stack[-1]:
+        stack.pop()
+        delete_count -= 1
+
+    stack.append(number)
+
+# 없앨 횟수가 남았으면 제일 뒤부터 제거해야 하기 때문에 n - k번째까지 출력
+print(''.join(stack[:n - k]))
+```
