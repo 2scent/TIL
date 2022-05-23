@@ -169,6 +169,8 @@ arr = [list(map(int, input().split())) for _ in range(3)]
 
 > <백준> [사칙연산](https://www.acmicpc.net/problem/10869)
 
+#### 풀이
+
 - 두 개의 자연수를 입력받고, 각 사칙연산의 결과를 출력하는 문제다.
 - 파이썬의 나눗셈 연산(/)은 기본적으로 소수점 이하를 포함하는 결과가 나오기 때문에 `int()`를 이용해 정수형으로 변환해준다.
 
@@ -185,6 +187,8 @@ print(a % b)
 ## if문
 
 > <백준> [두 수 비교하기](https://www.acmicpc.net/problem/1330)
+
+#### 풀이
 
 - if, elif, else를 이용해 적절하게 분기해서 출력하면 된다.
 
@@ -330,6 +334,9 @@ arr = list()
 > <백준> [최소, 최대](https://www.acmicpc.net/problem/10818)
 
 - [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/6%EC%9E%A5/6-1-1.py)
+
+#### 풀이
+
 - n개의 정수를 입력받기 위해 배열을 이용한다.
 
 ```python
@@ -757,4 +764,157 @@ while True:
         direction = turn(direction, times[time])
 
 print(time)
+```
+
+# 제9장 - 트리 (Tree)
+
+- 트리는 말 그대로 나무와 유사하게 계층적 구조를 가지는 자료 구조다.
+- 트리의 개념 및 용어에 대한 정리는 아래 링크로 대신한다.
+  - [트리의 개념 및 용어 설명](https://github.com/2scent/TIL/blob/main/data-structure-and-algorithm/programmers-data-structure-and-algorithm-with-python.md#%ED%8A%B8%EB%A6%AC-tree)
+- **트리를 사용하는 이유는 특정 원소를 찾을 때 O(logn)의 시간 복잡도가 걸리기 때문이다.**
+
+## 이진 트리의 순회 및 예제
+
+> <백준> [트리 순회](https://www.acmicpc.net/problem/1991)
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/9%EC%9E%A5/9-3.py)
+
+### 풀이
+
+- 전위 순회, 중위 순회, 후위 순회와 재귀 알고리즘을 알면 간단하게 풀 수 있는 문제다.
+
+```python
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.left = None
+        self.right = None
+
+    def preorder(self):
+        traversal = [self.data]
+        if self.left:
+            traversal += self.left.preorder()
+        if self.right:
+            traversal += self.right.preorder()
+        return traversal
+
+    def inorder(self):
+        traversal = []
+        if self.left:
+            traversal += self.left.inorder()
+        traversal.append(self.data)
+        if self.right:
+            traversal += self.right.inorder()
+        return traversal
+
+    def postorder(self):
+        traversal = []
+        if self.left:
+            traversal += self.left.postorder()
+        if self.right:
+            traversal += self.right.postorder()
+        traversal.append(self.data)
+        return traversal
+
+
+class BinaryTree:
+    def __init__(self, root):
+        self.root = root
+
+    def preorder(self):
+        return self.root.preorder() if self.root else []
+
+    def inorder(self):
+        return self.root.inorder() if self.root else []
+
+    def postorder(self):
+        return self.root.postorder() if self.root else []
+
+
+N = int(input())
+
+nodes = {}
+
+for _ in range(N):
+    cur, left, right = input().split()
+    nodes[cur] = nodes[cur] if cur in nodes.keys() else Node(cur)
+    if left != '.':
+        nodes[left] = nodes[left] if left in nodes.keys() else Node(left)
+        nodes[cur].left = nodes[left]
+    if right != '.':
+        nodes[right] = nodes[right] if right in nodes.keys() else Node(right)
+        nodes[cur].right = nodes[right]
+
+T = BinaryTree(nodes['A'])
+
+print(''.join(T.preorder()))
+print(''.join(T.inorder()))
+print(''.join(T.postorder()))
+```
+
+## 이진 검색 트리 예제
+
+> <백준> [이진 검색 트리](https://www.acmicpc.net/problem/5639)
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/9%EC%9E%A5/9-4-1.py)
+
+```python
+import sys
+
+sys.setrecursionlimit(20000)
+input = sys.stdin.readline
+
+
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.left = None
+        self.right = None
+
+
+class BinarySearchTree:
+    def __init__(self):
+        self.root = None
+
+    def postorder(self, node=None):
+        if not node:
+            node = self.root
+
+        traversal = []
+        if node.left:
+            traversal += self.postorder(node.left)
+        if node.right:
+            traversal += self.postorder(node.right)
+        traversal.append(node.data)
+        return traversal
+
+    def insert(self, data):
+        if not self.root:
+            self.root = Node(data)
+            return
+
+        node = self.root
+        while True:
+            if node.data > data:
+                if node.left:
+                    node = node.left
+                else:
+                    node.left = Node(data)
+                    break
+            else:
+                if node.right:
+                    node = node.right
+                else:
+                    node.right = Node(data)
+                    break
+
+
+bst = BinarySearchTree()
+while True:
+    try:
+        bst.insert(int(input()))
+    except:
+        break
+
+print('\n'.join(map(str, bst.postorder())))
 ```
