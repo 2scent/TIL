@@ -517,7 +517,7 @@ for _ in range(n):
         continue
 
     if command[0] == 'pop':
-        print(stack.pop() if len(stack) != 0 else -1)
+        print(stack.pop() if stack else -1)
         continue
 
     if command[0] == 'size':
@@ -525,11 +525,11 @@ for _ in range(n):
         continue
 
     if command[0] == 'empty':
-        print(1 if len(stack) != 0 else 0)
+        print(0 if stack else 1)
         continue
 
     if command[0] == 'top':
-        print(stack[-1] if len(stack) != 0 else -1)
+        print(stack[-1] if stack else -1)
         continue
 ```
 
@@ -570,7 +570,7 @@ print(result)
 
 ## 스택을 사용하는 예제 3
 
-> <백준> 크게 만들기
+> <백준> [크게 만들기](https://www.acmicpc.net/problem/2812)
 
 - [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/7%EC%9E%A5/7-6.py)
 - 6장의 ArrayList에서 **시간 초과**로 실패했던 문제다.
@@ -596,4 +596,165 @@ for number in number_list:
 
 # 없앨 횟수가 남았으면 제일 뒤부터 제거해야 하기 때문에 n - k번째까지 출력
 print(''.join(stack[:n - k]))
+```
+
+# 제8장 - 큐 (Queue)
+
+![큐](images/algorithm-code-for-coding-test/queue.png)
+
+- 먼저 입력된 데이터가 가장 먼저 출력되는 자료 구조
+- 선입선출 FIFO(First-In, First-Out)
+- 입출력 시, 각각 O(1)의 시간 복잡도
+  - n개의 데이터 입출력한다면 O(n)의 시간 복잡도
+- BFS(너비우선 탐색) 알고리즘에 꼭 필요한 자료구조
+- 큐를 사용하는 가장 큰 이유는 맨 앞에서 값을 지우는 연산의 시간 복잡도가 큐는 O(1), 배열은 O(n)
+
+## 큐를 사용하는 예제 1
+
+> <백준> [큐 2](https://www.acmicpc.net/problem/18258)
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/8%EC%9E%A5/8-2.py)
+
+### 풀이
+
+- 파이썬의 deque 라이브러리를 이용하면 쉽게 구현할 수 있다.
+
+```python
+import sys
+from collections import deque
+
+n = int(sys.stdin.readline())
+
+queue = deque()
+
+for _ in range(n):
+    command = sys.stdin.readline().split()
+
+    if command[0] == 'push':
+        queue.append(command[1])
+        continue
+
+    if command[0] == 'pop':
+        print(queue.popleft() if queue else -1)
+        continue
+
+    if command[0] == 'size':
+        print(len(queue))
+        continue
+
+    if command[0] == 'empty':
+        print(0 if queue else 1)
+        continue
+
+    if command[0] == 'front':
+        print(queue[0] if queue else -1)
+        continue
+
+    if command[0] == 'back':
+        print(queue[-1] if queue else -1)
+        continue
+```
+
+## 큐를 사용하는 예제 2
+
+> <백준> [카드2](https://www.acmicpc.net/problem/2164)
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/8%EC%9E%A5/8-3.py)
+
+### 풀이
+
+- deque 라이브러리를 이용하면 쉽게 풀 수 있는 문제다.
+- 카드 뭉치를 담고 있는 deque 변수의 이름이 `cards`일 때, 카드의 개수가 1이 될 때까지 `cards.popleft()`와 `cards.append(cards.popleft())`를 반복하면 된다.
+
+```python
+from collections import deque
+
+n = int(input())
+
+cards = deque(range(1, n + 1))
+while len(cards) > 1:
+    cards.popleft()
+    cards.append(cards.popleft())
+
+print(cards.popleft())
+```
+
+## 큐를 사용하는 예제 3
+
+> <백준> [뱀](https://www.acmicpc.net/problem/3190)
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/8%EC%9E%A5/8-4.py)
+
+### 풀이
+
+- 정사각형 보드의 상태
+  - `board = [[0] * N for _ in range(N)]`로 보드를 초기화한다.
+  - 0은 빈 칸, 1은 사과, 2는 뱀을 나타낸다.
+- 뱀의 현재 이동 방향
+  - `direction = 1`
+    - 0은 위쪽, 1은 오른쪽, 2은 아래쪽, 3은 왼쪽을 나타낸다.
+  - `dy = [-1, 0, 1, 0]`, `dx = [0, 1, 0, -1]`
+    - `dy[direction]`, `dx[direction]`와 같은 방법으로 뱀의 이동 위치를 구한다.
+- 한 번 이동할 때마다 걸린 시간(초)을 1씩 더하고, 다음 조건을 만족할 때까지 이동을 반복한다.
+  - 뱀이 벽에 부딪힌다.
+    - 뱀의 머리를 나타내는 변수인 `y` 또는 `x`가 0보다 작거나 보드의 크기를 나타내는 변수인 `N`보다 크거나 같아지는 경우
+  - 뱀이 자기 몸에 부딪힌다.
+    - 보드에서 뱀의 머리가 위치한 `board[y][x]`가 뱀의 몸을 나타내는 2인 경우
+
+```python
+import sys
+from collections import deque
+
+
+def turn(d, c):
+    if c == 'L':
+        return (d - 1) % 4
+    return (d + 1) % 4
+
+
+N = int(sys.stdin.readline())
+# N * N의 2차원 배열을 0(빈 칸)으로 초기화
+board = [[0] * N for _ in range(N)]
+
+K = int(sys.stdin.readline())
+# 사과의 위치를 1로 저장
+for _ in range(K):
+    a, b = map(int, sys.stdin.readline().split())
+    board[a - 1][b - 1] = 1
+
+L = int(sys.stdin.readline())
+times = {}
+for _ in range(L):
+    X, C = sys.stdin.readline().split()
+    times[int(X)] = C
+
+dy = [-1, 0, 1, 0]
+dx = [0, 1, 0, -1]
+
+# 0: 위쪽, 1: 오른쪽, 2: 아래쪽, 3: 왼쪽
+direction = 1
+time = 0
+# 뱀 머리의 현재 위치
+y, x = 0, 0
+# 뱀 몸통
+snake = deque([(y, x)])
+# 뱀의 위치를 2로 저장
+board[y][x] = 2
+
+while True:
+    time += 1
+    y, x = y + dy[direction], x + dx[direction]
+
+    if y < 0 or y >= N or x < 0 or x >= N or board[y][x] == 2:
+        break
+
+    if board[y][x] != 1:
+        del_y, del_x = snake.popleft()
+        board[del_y][del_x] = 0
+    board[y][x] = 2
+    snake.append((y, x))
+    if time in times.keys():
+        direction = turn(direction, times[time])
+
+print(time)
 ```
