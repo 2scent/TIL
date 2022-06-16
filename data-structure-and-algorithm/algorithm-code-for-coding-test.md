@@ -918,3 +918,167 @@ while True:
 
 print('\n'.join(map(str, bst.postorder())))
 ```
+
+# 제10장 - 맵 (Map)
+
+- 맵은 데이터를 Key-Value 형식으로 저장하는 자료구조다.
+- Key는 중복을 허용하지 않지만, Value는 중복을 허용한다.
+- 맵은 트리 형태 또는 해시를 이용하여 구현한다.
+
+## 트리를 이용하여 구현하는 맵
+
+![트리를 이용하여 구현하는 맵 사진]()
+
+- 완전 이진 검색 트리의 각 노드에 Key와 Value를 저장한다.
+- 이때 원하는 값을 찾거나 추가할 때, O(log<sub>2</sub>n)의 시간 복잡도가 걸린다.
+
+## 해시를 이용하여 구현하는 맵
+
+- 해시를 이용한 맵은 해싱한 Key를 통해 Key-Value를 저장한다.
+  - 해싱(Hashing)이란 Key 값이 주어졌을 때, 항상 동일한 해시값을 보장하는 방식이다.
+
+#### 입력된 숫자를 3으로 나눈 나머지 값으로 해싱하는 예시
+
+| 숫자 | 해시값 |
+| :--: | :----: |
+|  1   |   1    |
+|  2   |   2    |
+|  3   |   0    |
+|  4   |   1    |
+|  5   |   2    |
+
+- 해싱을 10억으로 나눈 나머지로 한다면 10억 이하의 수는 모두 다른 해시값을 가질 것이다.
+- 문제는 해싱을 10억으로 나눈 나머지를 설정한다면 메모리를 매우 많이 차지하기 때문에 보통 **체이닝** 또는 **오픈 어드레싱** 방법을 사용한다.
+
+### 체이닝 방식
+
+![체이닝 방식 사진]()
+
+- 동일한 해시값으로 인한 해시 충돌이 발생할 경우 동일한 해시값에 해당하는 Key끼리 서로 연결해서 저장하는 방식이다.
+- Key값에 Value를 찾거나 추가할 때는 해시값을 이용한 메모리에 접근하면 되기 때문에 평균적으로 O(1)의 시간 복잡도가 소요되지만, 해시값의 위치에 연결된 데이터가 많다면 최대 O(n)의 시간 복잡도가 소요된다.
+
+### 오픈 어드레싱 방식
+
+![오픈 어드레싱 방식 사진]()
+
+- 해시값에 해당하는 메모리 위치에 Key-Value가 있다면 그 위치부터 탐색해가며 아무 값도 없는 위치에 Key-Value를 넣는 방식이다.
+- 메모리를 효율적으로 사용할 수 있지만, 최악의 경우 해시값의 충돌이 일어나 비어 있는 메모리를 찾을 때까지 시간 복잡도(메모리 크기)가 된다. 평균적으로는 O(1)의 시간 복잡도를 보장한다.
+
+## 맵의 시간 복잡도 정리
+
+|      |     트리를 이용     | 해시를 이용 |
+| :--: | :-----------------: | :---------: |
+| 탐색 | O(log<sub>2</sub>n) |  평균 O(1)  |
+| 추가 | O(log<sub>2</sub>n) |  평균 O(1)  |
+
+- 파이썬은 해시를 이용하여 맵을 구현한다.
+
+## 맵을 사용하는 예제 1
+
+> <백준> [패션왕 신해빈](https://www.acmicpc.net/problem/9375)
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/10%EC%9E%A5/10-4.py)
+
+### 풀이
+
+- A라는 의상 종류에 a1, a2 의상이 있을 때, 선택할 수 있는 건 (a1, a2, 선택 안 함) 3가지가 있다.
+- B라는 의상 종류에서 b1 의상이 있을 때, 선택할 수 있는 건 (b1, 선택 안 함) 2가지가 있다.
+- 답을 구하기 위해선 각 의상에서 선택할 수 있는 수, 즉 A의 3과 B의 2를 곱한 후, 아무 것도 입지 않은 상태인 1를 빼주면 된다.
+
+```python
+T = int(input())
+
+for _ in range(T):
+    M = {}
+    N = int(input())
+
+    for _ in range(N):
+        a, b = input().split()
+        if b in M:
+            M[b] += 1
+        else:
+            M[b] = 1
+
+    result = 1
+    for n in M.values():
+        result *= n + 1
+    result -= 1
+
+    print(result)
+```
+
+## 맵을 사용하는 예제 2
+
+> <코드포스> [D. Non-zero Segments](https://codeforces.com/problemset/problem/1426/D)
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/10%EC%9E%A5/10-5-1.py)
+- 나중에 복습
+
+## 맵을 사용하는 예제 3
+
+> <코드포스> [D. MEX maximizing](https://codeforces.com/problemset/problem/1294/D)
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/10%EC%9E%A5/10-5-2.py)
+- 나중에 복습
+
+# 제11장 - 힙, 우선순위 큐
+
+## 힙 (Heap)
+
+- 힙은 다른 자료구조를 구현하는 기술 중 하나로 쓰인다.
+- 직접 구현하기보다는 추상적인 개념을 확실히 숙지하자.
+
+### 최대 힙 (Max Heap)
+
+- 부모 노드가 자식 노드보다 값이 큰 완전 이진 트리
+- 부모 노드의 모든 값이 자식 노드보다 커야 한다.
+- 루트 노드는 항상 최댓값을 가진다.
+
+### 최소 힙 (Min Heap)
+
+- 부모 노드의 값이 자식 노드보다 작은 완전 이진 트리
+- 부모 노드의 모든 값이 자식 노드보다 작아야 한다.
+- 루트 노드는 항상 최솟값을 가진다.
+
+## 우선순위 큐 (Priority Queue)
+
+- 데이터의 최댓값 혹은 최솟값을 삭제하는 경우가 번번하며 삭제를 해도 최댓값 혹은 최솟값을 O(1)로 확인하기 위한 자료구조
+- 힙 자료구조를 통해 구현하기 때문에 입력과 삭제에는 O(logn)이 소요되며, 최댓값 혹은 최솟값을 O(1)로 확인할 수 있다는 장점이 있다.
+- 삽입의 순서에 상관없이 우선순위가 높은 데이터가 가장 먼저 출력된다.
+
+### 우선순위 큐를 사용하는 예제 1
+
+> <백준> [최대 힙](https://www.acmicpc.net/problem/11279)
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/11%EC%9E%A5/11-5.py)
+
+#### 풀이
+
+- 파이썬의 heapq 라이브러리를 이용한다.
+- 최대 힙처럼 사용하기 위해서 데이터를 추가, 삭제할 때 -를 붙여준다.
+
+```python
+import sys
+import heapq
+
+n = int(sys.stdin.readline())
+
+heap = []
+for _ in range(n):
+    x = int(sys.stdin.readline())
+
+    if x == 0:
+        if len(heap) > 0:
+            print(-heapq.heappop(heap))
+        else:
+            print(0)
+        continue
+
+    heapq.heappush(heap, -x)
+```
+
+### 우선순위 큐를 사용하는 예제 2
+
+> <백준> [카드 정렬하기](https://www.acmicpc.net/problem/11279)
+
+- [저자의 해답 코드](https://github.com/rnjsrnrdnjs/Algorithm-code-for-coding-test/blob/main/src/11%EC%9E%A5/11-6.py)
