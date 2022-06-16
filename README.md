@@ -1,3 +1,7 @@
+# [https://han-study.tistory.com/](https://han-study.tistory.com/) 이 저장소의 역할은 블로그로 대체합니다.
+
+---
+
 # Today I Learned (TIL)
 
 ## 규칙
